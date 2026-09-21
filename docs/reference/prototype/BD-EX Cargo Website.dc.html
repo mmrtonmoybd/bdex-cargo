@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BD-EX Cargo — Australia ↔ Bangladesh Courier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:#f6faf7;color:#101f1a;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:clip}
+  a{color:#12457f;text-decoration:none}
+  a:hover{color:#c8102e}
+  input,select,textarea,button{font-family:inherit}
+  ::selection{background:#c8102e;color:#fff}
+  @keyframes bdxUp{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+  @keyframes bdxIn{from{opacity:0}to{opacity:1}}
+  @keyframes bdxFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+  @keyframes bdxPlane{0%{transform:translateX(-8%) translateY(4px) rotate(-3deg)}100%{transform:translateX(8%) translateY(-4px) rotate(-3deg)}}
+  @keyframes bdxMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @keyframes bdxPulse{0%{box-shadow:0 0 0 0 rgba(200,16,46,.45)}70%{box-shadow:0 0 0 18px rgba(200,16,46,0)}100%{box-shadow:0 0 0 0 rgba(200,16,46,0)}}
+  @keyframes bdxDash{to{stroke-dashoffset:-200}}
+  @keyframes bdxShine{0%{transform:translateX(-120%)}60%,100%{transform:translateX(220%)}}
+  @keyframes bdxSpin{to{transform:rotate(360deg)}}
+  [data-reveal]{opacity:0;transform:translateY(28px)}
+  [data-reveal].bdx-seen{animation:bdxUp .8s cubic-bezier(.2,.7,.3,1) both}
+</style>
+</helmet>
+
+<div style="max-width:100%;overflow-x:clip">
+
+  <!-- ============ TOP BAR ============ -->
+  <div style="background:#0d2b22;color:#cfe6da;font-size:13px;padding:9px 20px;display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;justify-content:center">
+    <span style="display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:50%;background:#3ad08f;display:inline-block"></span>Daily shipments · Bangladesh ⇄ Australia</span>
+    <span style="opacity:.45">|</span>
+    <a href="tel:0411123393" style="color:#fff;font-weight:700">Call 0411 123 393</a>
+    <span style="opacity:.45">|</span>
+    <span style="display:flex;gap:14px;align-items:center"><a href="#booking" style="color:#fff;font-weight:600">Login</a><span style="opacity:.45">|</span><a href="#booking" style="color:#fff;font-weight:600">Sign up</a></span>
+  </div>
+
+  <!-- ============ NAV ============ -->
+  <header style="position:sticky;top:0;z-index:60;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-bottom:1px solid #e2ece6;box-shadow:0 4px 18px rgba(16,31,26,.06)">
+    <nav style="max-width:1240px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:18px">
+      <a href="#top" style="display:flex;align-items:center;gap:11px;flex:0 0 auto">
+        <img src="assets/bdex-logo.png" alt="BD-EX Cargo" style="height:46px;width:auto;display:block" />
+      </a>
+      <div style="flex:1"></div>
+      <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:flex-end">
+          <sc-for list="{{ navLinks }}" as="l" hint-placeholder-count="5">
+            <a href="{{ l.href }}" style="padding:9px 12px;border-radius:9px;font-size:14px;font-weight:600;color:#2b3d36" style-hover="background:#eef6f1;color:#00694b">{{ l.label }}</a>
+          </sc-for>
+          <a href="#booking" style="margin-left:8px;padding:11px 20px;border-radius:999px;background:#c8102e;color:#fff;font-weight:700;font-size:14px;box-shadow:0 8px 20px rgba(200,16,46,.3)" style-hover="background:#a50d25;color:#fff;transform:translateY(-1px)">Book a pickup</a>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ toggleMenu }}" aria-label="Menu" style="width:48px;height:44px;display:flex;flex-direction:column;justify-content:center;gap:5px;align-items:center;border:1px solid #dbe7e1;border-radius:11px;background:#fff;cursor:pointer">
+          <span style="{{ burger1 }}"></span>
+          <span style="{{ burger2 }}"></span>
+          <span style="{{ burger3 }}"></span>
+        </button>
+      </sc-if>
+    </nav>
+    <div style="{{ drawerStyle }}">
+      <div style="padding:6px 20px 20px;display:grid;gap:0">
+        <sc-for list="{{ navLinks }}" as="l" hint-placeholder-count="6">
+          <a href="{{ l.href }}" onClick="{{ closeMenu }}" style="padding:15px 2px;border-bottom:1px solid #eef2ef;font-size:16px;font-weight:600;color:#2b3d36;display:flex;justify-content:space-between;align-items:center" style-hover="color:#c8102e"><span>{{ l.label }}</span><span style="color:#b9c7c0">›</span></a>
+        </sc-for>
+        <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+          <a href="#booking" onClick="{{ closeMenu }}" style="flex:1 1 150px;text-align:center;padding:14px;border-radius:999px;background:#c8102e;color:#fff;font-weight:700;font-size:15px" style-hover="background:#a50d25;color:#fff">Book a pickup</a>
+          <a href="tel:0411123393" style="flex:1 1 120px;text-align:center;padding:14px;border-radius:999px;border:1.5px solid #cfdcd6;color:#00694b;font-weight:700;font-size:15px" style-hover="border-color:#00694b;color:#00694b">Call 0411 123 393</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ HERO SLIDER ============ -->
+  <section id="top" style="position:relative;min-height:clamp(560px,74vh,700px);display:grid;align-items:center;overflow:hidden;background:#06231b">
+    <sc-for list="{{ slides }}" as="s" hint-placeholder-count="1">
+      <div style="{{ s.wrapStyle }}">
+        <div style="position:absolute;inset:0;background:linear-gradient(100deg,rgba(6,35,27,.92) 0%,rgba(6,35,27,.72) 45%,rgba(6,35,27,.25) 100%)"></div>
+      </div>
+    </sc-for>
+
+    <div style="{{ heroGrid }}">
+      <div style="min-width:0">
+        <div style="display:inline-flex;align-items:center;gap:9px;padding:7px 15px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#eafff5;font-size:12.5px;font-weight:700;letter-spacing:1.4px;animation:bdxUp .6s ease both">
+          <span style="width:16px;height:11px;background:linear-gradient(#00694b 60%,#c8102e 60%);border-radius:2px;display:inline-block"></span>
+          FAST · AFFORDABLE · HASSLE-FREE SHIPPING
+        </div>
+        <h1 style="margin:20px 0 0;font-size:clamp(34px,5vw,58px);line-height:1.06;letter-spacing:-1.6px;color:#fff;font-weight:800;text-wrap:balance;animation:bdxUp .7s .06s ease both">Parcels from Bangladesh to Australia in 6–9 working days</h1>
+        <p style="margin:18px 0 0;max-width:560px;font-size:clamp(15.5px,1.5vw,18px);line-height:1.6;color:#c9e3d7;text-wrap:pretty;animation:bdxUp .7s .12s ease both">Free pickup from any address in Bangladesh, free box and packaging, live tracking, and home delivery anywhere in Australia. Book online — no phone call needed.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:18px;animation:bdxUp .7s .16s ease both">
+          <sc-for list="{{ heroChips }}" as="c" hint-placeholder-count="4">
+            <span style="padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#dff3e9;font-size:13px;font-weight:600">{{ c }}</span>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:30px;animation:bdxUp .7s .2s ease both">
+          <a href="#booking" style="padding:15px 28px;border-radius:999px;background:#c8102e;color:#fff;font-weight:700;font-size:15px;animation:bdxPulse 2.8s infinite" style-hover="background:#fff;color:#c8102e">Book online — no phone call</a>
+          <a href="#calculator" style="padding:15px 28px;border-radius:999px;border:1.5px solid rgba(255,255,255,.4);color:#fff;font-weight:700;font-size:15px" style-hover="background:rgba(255,255,255,.14);color:#fff">Get an instant quote</a>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:38px">
+          <sc-for list="{{ slideDots }}" as="d" hint-placeholder-count="3">
+            <button onClick="{{ d.go }}" aria-label="slide" style="{{ d.style }}"></button>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- tracking card -->
+      <div style="min-width:0;background:rgba(255,255,255,.97);border-radius:22px;padding:26px;box-shadow:0 30px 70px rgba(0,0,0,.35);animation:bdxUp .8s .25s ease both">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="width:34px;height:34px;border-radius:10px;background:#eef6f1;display:grid;place-items:center;color:#00694b;font-size:15px"><i class="fa-solid fa-magnifying-glass-location"></i></span>
+          <strong style="font-size:17px">Track your parcel</strong>
+        </div>
+        <p style="margin:10px 0 16px;font-size:13.5px;color:#5b6b64;line-height:1.5">Enter your BD-EX tracking number — recipients need nothing else.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input value="{{ v_track }}" onChange="{{ on_track }}" placeholder="e.g. BDX-8421903" style="flex:1 1 180px;min-width:0;padding:14px 15px;border-radius:12px;border:1.5px solid #dbe7e1;font-size:15px;outline:none;background:#f8fbf9" style-focus="border-color:#00694b;background:#fff" />
+          <button onClick="{{ doTrack }}" style="padding:14px 22px;border-radius:12px;border:none;background:#12457f;color:#fff;font-weight:700;font-size:15px;cursor:pointer" style-hover="background:#0d3564">Track</button>
+        </div>
+        <sc-if value="{{ trackFound }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:20px;border-top:1px dashed #dbe7e1;padding-top:18px">
+            <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+              <span style="font-size:13px;color:#5b6b64">Ref <strong style="color:#101f1a">{{ trackRef }}</strong></span>
+              <span style="font-size:12px;font-weight:700;color:#00694b;background:#e7f5ed;padding:4px 10px;border-radius:999px">{{ trackStatus }}</span>
+            </div>
+            <sc-for list="{{ trackSteps }}" as="t" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:22px 1fr;gap:12px;align-items:start">
+                <div style="display:grid;justify-items:center;gap:2px">
+                  <span style="{{ t.dot }}"></span>
+                  <span style="{{ t.line }}"></span>
+                </div>
+                <div style="padding-bottom:14px">
+                  <div style="{{ t.labelStyle }}">{{ t.label }}</div>
+                  <div style="font-size:12px;color:#8a9a93">{{ t.time }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ trackEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px;font-size:13px;color:#c8102e;background:#fdeef0;padding:11px 13px;border-radius:10px">No parcel found for that number. Try BDX-8421903 (demo).</div>
+        </sc-if>
+      </div>
+    </div>
+
+    <!-- marquee strip -->
+    <div style="position:absolute;bottom:0;left:0;right:0;z-index:4;background:#c8102e;overflow:hidden;padding:10px 0">
+      <div style="display:flex;width:200%;animation:bdxMarquee 26s linear infinite">
+        <sc-for list="{{ marquee }}" as="m" hint-placeholder-count="12">
+          <span style="padding:0 26px;color:#ffe6ea;font-size:12.5px;font-weight:700;letter-spacing:2px;white-space:nowrap">{{ m }}</span>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ STATS ============ -->
+  <section style="background:#fff;border-bottom:1px solid #e9f1ec">
+    <div style="max-width:1240px;margin:0 auto;padding:44px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:26px">
+      <sc-for list="{{ stats }}" as="st" hint-placeholder-count="4">
+        <div style="min-width:0">
+          <div style="font-size:clamp(30px,3.4vw,42px);font-weight:800;letter-spacing:-1.6px;color:#00694b">{{ st.n }}</div>
+          <div style="font-size:14px;color:#5b6b64;line-height:1.45;margin-top:4px">{{ st.l }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section id="about" style="background:#fff;border-bottom:1px solid #e9f1ec">
+    <div style="max-width:1240px;margin:0 auto;padding:clamp(48px,6vw,86px) 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(28px,4vw,56px);align-items:start">
+      <div style="min-width:0">
+        <span style="font-size:12px;font-weight:800;letter-spacing:3px;color:#12457f">ABOUT BD-EX CARGO</span>
+        <h2 style="margin:14px 0 18px;font-size:clamp(28px,3.4vw,42px);letter-spacing:-1.3px;line-height:1.1;font-weight:800;text-wrap:balance">A cargo service built for the Bangladeshi community abroad</h2>
+        <p style="margin:0 0 14px;font-size:16px;line-height:1.7;color:#41544c">BD-EX Cargo is an international courier delivery aggregator and broker. After a decade of express shipping in the United Kingdom, we began serving Australia and North America in April 2012 — shipping goods to loved ones in Bangladesh with maximum convenience and guaranteed satisfaction.</p>
+        <p style="margin:0 0 22px;font-size:16px;line-height:1.7;color:#41544c">Our network runs through drop-off stations in Sydney and in New York and New Jersey, backed by daily consolidated shipments, customs clearance handled end to end, and free home delivery across Bangladesh.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <sc-for list="{{ aboutTags }}" as="t" hint-placeholder-count="3">
+            <span style="display:inline-flex;align-items:center;gap:8px;border:1px solid #dde8e2;padding:9px 14px;font-size:13.5px;font-weight:600;color:#2e403a"><i class="{{ t.fa }}" style="color:#12457f"></i>{{ t.label }}</span>
+          </sc-for>
+        </div>
+      </div>
+      <div style="min-width:0;border-top:2px solid #12457f">
+        <sc-for list="{{ assurances }}" as="a" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:baseline;padding:18px 0;border-bottom:1px solid #e9f0ec">
+            <div style="font-size:30px;font-weight:800;letter-spacing:-1.2px;color:#12457f;min-width:92px">{{ a.n }}</div>
+            <div style="font-size:14.5px;line-height:1.6;color:#41544c">{{ a.l }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SERVICE CATEGORIES ============ -->
+  <section id="solutions" style="max-width:1240px;margin:0 auto;padding:clamp(48px,6vw,86px) 20px 0">
+    <div style="display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:end;margin-bottom:32px">
+      <div style="min-width:0">
+        <span style="font-size:12px;font-weight:800;letter-spacing:3px;color:#c8102e">OUR SERVICE</span>
+        <h2 style="margin:14px 0 0;font-size:clamp(28px,3.4vw,42px);letter-spacing:-1.3px;line-height:1.1;font-weight:800">Tailored solutions for your needs</h2>
+      </div>
+      <p style="min-width:0;max-width:42ch;margin:0;font-size:15.5px;line-height:1.65;color:#5b6b64">Every customer ships differently. We work in three lanes — corporate accounts, personal parcels and online stores.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:20px">
+      <sc-for list="{{ solutions }}" as="s" hint-placeholder-count="3">
+        <div style="min-width:0;border:1px solid #e2ece6;background:#fff;transition:box-shadow .25s ease,transform .25s ease" style-hover="box-shadow:0 18px 40px rgba(16,31,26,.1);transform:translateY(-4px)">
+          <div style="{{ s.photo }}"></div>
+          <div style="padding:22px">
+            <div style="display:flex;align-items:center;gap:10px;color:#12457f;font-size:15px"><i class="{{ s.fa }}"></i><h3 style="margin:0;font-size:18px;font-weight:800;letter-spacing:-.3px;color:#101f1a">{{ s.t }}</h3></div>
+            <p style="margin:10px 0 0;font-size:14.5px;line-height:1.65;color:#5b6b64">{{ s.d }}</p>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ BENEFITS BD→AUS ============ -->
+  <section id="services" style="max-width:1240px;margin:0 auto;padding:86px 20px 20px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:40px;align-items:end">
+      <div style="min-width:0">
+        <span style="font-size:12px;font-weight:800;letter-spacing:3px;color:#c8102e">BANGLADESH → AUSTRALIA</span>
+        <h2 style="margin:14px 0 0;font-size:clamp(30px,3.8vw,46px);letter-spacing:-1.6px;line-height:1.06;font-weight:800;text-wrap:balance">What you get with<br>every BD-EX shipment</h2>
+      </div>
+      <p style="min-width:0;font-size:17.5px;line-height:1.7;color:#41544c;margin:0">Everything below is included in the rate you see — free pickup from any address in Bangladesh, free box and packaging, live tracking, and home delivery anywhere in Australia.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:0 52px;margin-top:40px;border-top:2px solid #16241f">
+      <sc-for list="{{ benefits }}" as="b" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:38px 1fr;gap:16px;align-items:start;padding:20px 2px;border-bottom:1px solid #dfe8e3;min-width:0">
+          <span style="width:38px;height:38px;border:1px solid #d5e3db;background:#fff;display:grid;place-items:center;color:#00694b;font-size:15px"><i class="{{ b.fa }}"></i></span>
+          <div style="min-width:0">
+            <h3 style="margin:0 0 5px;font-size:17.5px;font-weight:700;letter-spacing:-.3px">{{ b.en }}</h3>
+            <p style="margin:0;font-size:14.5px;line-height:1.62;color:#5b6b64">{{ b.d }}</p>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="margin-top:18px;background:#fff8e9;border:1px solid #f2e0b8;border-radius:14px;padding:16px 20px;font-size:14px;color:#6b5320;line-height:1.6">
+      <strong>Note:</strong> A handling charge is added for non-garments items. The calculator below includes it automatically.
+    </div>
+  </section>
+
+  <!-- ============ CALCULATOR ============ -->
+  <section id="calculator" style="margin-top:90px;background:#06231b;position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;opacity:.16"><img src="https://picsum.photos/seed/bdexcargoplane/1800/900" alt="" style="width:100%;height:100%;object-fit:cover" /></div>
+    <div style="position:relative;max-width:1240px;margin:0 auto;padding:84px 20px">
+      <div style="text-align:center;max-width:640px;margin:0 auto">
+        <span style="font-size:12px;font-weight:800;letter-spacing:3px;color:#7fd3ae">INSTANT QUOTE</span>
+        <h2 style="margin:14px 0 10px;color:#fff;font-size:clamp(30px,3.8vw,46px);letter-spacing:-1.6px;line-height:1.07;font-weight:800">Price calculator</h2>
+        <p style="margin:0;color:#a9cbbc;font-size:17px;line-height:1.6">No hidden fees. The number on screen is the number you pay.</p>
+      </div>
+
+      <div style="margin-top:40px;background:#fff;border-radius:26px;padding:clamp(20px,3vw,36px);display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:clamp(24px,3vw,44px);box-shadow:0 40px 90px rgba(0,0,0,.35)">
+        <div style="min-width:0">
+          <div style="display:flex;gap:8px;background:#f1f6f3;padding:6px;border-radius:14px;margin-bottom:24px">
+            <sc-for list="{{ dirTabs }}" as="d" hint-placeholder-count="2">
+              <button onClick="{{ d.go }}" style="{{ d.style }}">{{ d.label }}</button>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ isAusBd }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Sending from</label>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+                <sc-for list="{{ stateTabs }}" as="s" hint-placeholder-count="2">
+                  <button onClick="{{ s.go }}" style="{{ s.style }}">{{ s.label }}</button>
+                </sc-for>
+              </div>
+              <label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Item category</label>
+              <select value="{{ v_cat }}" onChange="{{ on_cat }}" style="width:100%;padding:14px;border-radius:12px;border:1.5px solid #dbe7e1;font-size:15px;background:#f8fbf9;margin-bottom:20px;outline:none">
+                <sc-for list="{{ categories }}" as="c" hint-placeholder-count="6">
+                  <option value="{{ c.id }}">{{ c.label }}</option>
+                </sc-for>
+              </select>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ needsWeight }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <label style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#41544c;margin-bottom:9px"><span>Total weight</span><span style="color:#c8102e">{{ weightLabel }}</span></label>
+              <input type="range" min="1" max="80" step="0.5" value="{{ v_weight }}" onChange="{{ on_weight }}" style="width:100%;accent-color:#c8102e;margin-bottom:8px" />
+              <input value="{{ v_weight }}" onChange="{{ on_weight }}" style="width:120px;padding:11px 13px;border-radius:11px;border:1.5px solid #dbe7e1;font-size:15px;background:#f8fbf9;outline:none" />
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isBdAus }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:22px">
+              <label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Item type</label>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <sc-for list="{{ itemTypeTabs }}" as="t" hint-placeholder-count="2">
+                  <button onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button>
+                </sc-for>
+              </div>
+              <p style="margin:12px 0 0;font-size:13px;color:#8a9a93">Per-kg rates shown are for garment items; non-garments add a handling charge.</p>
+            </div>
+          </sc-if>
+        </div>
+
+        <!-- quote panel -->
+        <div style="min-width:0;background:#f6faf7;border:1px solid #e2ece6;border-radius:20px;padding:clamp(20px,2.4vw,28px);display:flex;flex-direction:column">
+          <span style="font-size:12px;font-weight:800;letter-spacing:2.4px;color:#00694b">YOUR ESTIMATE</span>
+          <div style="display:flex;align-items:baseline;gap:8px;margin:12px 0 4px">
+            <span style="font-size:clamp(40px,6vw,58px);font-weight:800;letter-spacing:-2.6px;color:#101f1a;line-height:1">{{ quoteTotal }}</span>
+            <span style="font-size:15px;font-weight:700;color:#5b6b64">AUD</span>
+          </div>
+          <div style="font-size:13.5px;color:#5b6b64">{{ quoteEta }}</div>
+          <div style="height:1px;background:#dfeae4;margin:20px 0"></div>
+          <sc-for list="{{ quoteLines }}" as="q" hint-placeholder-count="3">
+            <div style="display:flex;justify-content:space-between;gap:14px;font-size:14px;padding:7px 0;color:#3a4d46">
+              <span>{{ q.label }}</span>
+              <strong style="white-space:nowrap">{{ q.value }}</strong>
+            </div>
+          </sc-for>
+          <div style="height:1px;background:#dfeae4;margin:16px 0"></div>
+          <div style="display:flex;justify-content:space-between;gap:14px;font-size:16px;font-weight:800">
+            <span>Total</span><span>{{ quoteTotal }}</span>
+          </div>
+          <p style="margin:16px 0 0;font-size:12px;color:#8a9a93;line-height:1.6">Estimate only. Government duty, volume and airport fees on TVs and oversized items are quoted separately — see the rate tables below.</p>
+          <a href="#booking" style="margin-top:auto;display:block;text-align:center;margin-bottom:0;padding:15px;border-radius:999px;background:#c8102e;color:#fff;font-weight:700;font-size:15px" style-hover="background:#a50d25;color:#fff">Book this shipment</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RATE TABLES ============ -->
+  <section id="rates" style="max-width:1240px;margin:0 auto;padding:86px 20px">
+    <div style="display:flex;flex-wrap:wrap;gap:20px;align-items:end;justify-content:space-between">
+      <div style="min-width:0">
+        <span style="font-size:12px;font-weight:800;letter-spacing:3px;color:#c8102e">RATE CARD</span>
+        <h2 style="margin:14px 0 0;font-size:clamp(30px,3.8vw,46px);letter-spacing:-1.6px;line-height:1.06;font-weight:800">Transparent pricing,<br>both directions</h2>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <sc-for list="{{ rateTabs }}" as="r" hint-placeholder-count="3">
+          <button onClick="{{ r.go }}" style="{{ r.style }}">{{ r.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- AUS -> BD table -->
+    <sc-if value="{{ showAusBdTable }}" hint-placeholder-val="{{ true }}">
+      <div style="margin-top:34px;background:#fff;border:1px solid #e6efea;border-radius:20px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr) minmax(0,1fr);background:#c8102e;color:#fff">
+          <div style="padding:16px 20px;font-size:13px;font-weight:800;letter-spacing:1.2px">ITEM CATEGORY</div>
+          <div style="padding:16px 12px;font-size:13px;font-weight:800;letter-spacing:1.2px;text-align:center;background:#00694b">NSW RATE</div>
+          <div style="padding:16px 12px;font-size:13px;font-weight:800;letter-spacing:1.2px;text-align:center;background:#12457f">ACT · VIC · QLD · SA · WA · TAS</div>
+        </div>
+        <sc-for list="{{ ausBdRows }}" as="r" hint-placeholder-count="13">
+          <div style="{{ r.rowStyle }}">
+            <div style="padding:14px 20px;min-width:0">
+              <div style="font-size:15px;font-weight:700">{{ r.name }}</div>
+              <div style="font-size:12.5px;color:#7b8b84;line-height:1.5;margin-top:2px">{{ r.note }}</div>
+            </div>
+            <div style="padding:14px 12px;text-align:center;font-weight:800;font-size:15px;color:#00694b">{{ r.nsw }}</div>
+            <div style="padding:14px 12px;text-align:center;font-weight:800;font-size:15px;color:#12457f">{{ r.other }}</div>
+          </div>
+        </sc-for>
+        <div style="padding:16px 20px;background:#f6faf7;font-size:13px;color:#5b6b64">$35 airport fee per shipment · Free home delivery after customs clearance · 10–18 working days from flight date.</div>
+      </div>
+    </sc-if>
+
+    <!-- BD -> AUS table -->
+    <sc-if value="{{ showBdAusTable }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:34px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px">
+        <div style="background:#fff;border:1px solid #e6efea;border-radius:20px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:1fr 1fr;background:#c8102e;color:#fff">
+            <div style="padding:15px 18px;font-size:13px;font-weight:800;letter-spacing:1.2px">WEIGHT (KG)</div>
+            <div style="padding:15px 18px;font-size:13px;font-weight:800;letter-spacing:1.2px;text-align:right;background:#12457f">PRICE PER KG</div>
+          </div>
+          <sc-for list="{{ bdAusRows }}" as="r" hint-placeholder-count="17">
+            <div style="{{ r.rowStyle }}">
+              <div style="padding:11px 18px;font-size:15px;font-weight:600">{{ r.w }}</div>
+              <div style="padding:11px 18px;font-size:15px;font-weight:800;text-align:right;color:#12457f">{{ r.p }}</div>
+            </div>
+          </sc-for>
+          <div style="padding:14px 18px;background:#f6faf7;font-size:12.5px;color:#c8102e;font-weight:700">*For garment items only</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
+          <div style="background:linear-gradient(150deg,#00694b,#0a4e3a);color:#fff;border-radius:20px;padding:28px">
+            <div style="font-size:12px;letter-spacing:2.6px;font-weight:800;color:#9fdcc0">DELIVERY TIME</div>
+            <div style="font-size:58px;font-weight:800;letter-spacing:-3px;line-height:1;margin:10px 0 4px">4+</div>
+            <div style="font-size:15px;color:#cfeadd">estimated business days, Bangladesh to Australia</div>
+          </div>
+          <div style="background:#fff;border:1px solid #e6efea;border-radius:20px;padding:26px">
+            <h3 style="margin:0 0 12px;font-size:18px;font-weight:800;letter-spacing:-.4px">Booking formalities</h3>
+            <p style="margin:0 0 12px;font-size:14.5px;line-height:1.7;color:#41544c">Book online below, or SMS <strong>0411 123 393</strong> with the sender (Bangladesh) and receiver (Australia) name, address and mobile number. Our Dhaka pickup team calls your sender within 24 hours.</p>
+            <p style="margin:0;font-size:14.5px;line-height:1.7;color:#5b6b64">Nothing to pay up front. Your sender hands the parcel to our driver, and payment can be settled on either side — Bangladesh or Australia.</p>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- TV table -->
+    <sc-if value="{{ showTvTable }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:34px">
+        <p style="margin:0 0 22px;font-size:16px;line-height:1.7;color:#41544c;max-width:760px">Approximate cost guideline for sending a TV from Sydney to Bangladesh. Every line below is added together — freight by weight, airport processing, volume fee, Bangladesh government duty and local home delivery.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px">
+          <sc-for list="{{ tvCards }}" as="t" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #e6efea;border-radius:20px;overflow:hidden;transition:transform .25s ease,box-shadow .25s ease" style-hover="transform:translateY(-6px);box-shadow:0 22px 44px rgba(16,31,26,.1)">
+              <div style="background:#12457f;color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center">
+                <strong style="font-size:20px;letter-spacing:-.6px">{{ t.size }}</strong>
+                <span style="font-size:12px;letter-spacing:1.6px;color:#bfd6ef;font-weight:700">TELEVISION</span>
+              </div>
+              <div style="padding:8px 20px 18px">
+                <sc-for list="{{ t.lines }}" as="l" hint-placeholder-count="5">
+                  <div style="display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #f0f5f2;font-size:14px;color:#3a4d46">
+                    <span>{{ l.k }}</span><strong style="white-space:nowrap">{{ l.v }}</strong>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-top:20px;background:#fff;border:1px solid #e6efea;border-radius:20px;padding:26px">
+          <h3 style="margin:0 0 14px;font-size:17px;font-weight:800">TV tax in Bangladesh (BDT)</h3>
+          <div style="display:flex;flex-wrap:wrap;gap:10px">
+            <sc-for list="{{ tvTax }}" as="x" hint-placeholder-count="7">
+              <div style="background:#f6faf7;border:1px solid #e2ece6;border-radius:12px;padding:10px 16px;font-size:14px"><strong>{{ x.size }}</strong> <span style="color:#5b6b64">·</span> {{ x.tax }}</div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+  </section>
+
+  <!-- ============ BOOKING ============ -->
+  <section id="booking" style="background:#fff;border-top:1px solid #e9f1ec;border-bottom:1px solid #e9f1ec">
+    <div style="max-width:1240px;margin:0 auto;padding:86px 20px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:46px">
+        <div style="min-width:0">
+          <span style="font-size:12px;font-weight:800;letter-spacing:3px;color:#c8102e">ONLINE BOOKING</span>
+          <h2 style="margin:14px 0 14px;font-size:clamp(30px,3.8vw,46px);letter-spacing:-1.6px;line-height:1.06;font-weight:800;text-wrap:balance">Book a pickup in four steps</h2>
+          <p style="margin:0 0 26px;font-size:17px;line-height:1.65;color:#41544c;max-width:520px">No WhatsApp thread, no waiting for a reply. Fill this in and our Dhaka or Sydney team confirms within 24 hours with your label and tracking number.</p>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <sc-for list="{{ bookingPerks }}" as="p" hint-placeholder-count="4">
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <span style="color:#00694b;font-size:14px;flex:0 0 auto;margin-top:3px"><i class="fa-solid fa-check"></i></span>
+                <span style="font-size:15px;line-height:1.55;color:#3a4d46">{{ p }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:30px;border-radius:20px;overflow:hidden;position:relative;height:220px">
+            <img src="https://picsum.photos/seed/bdexpickupvan/900/500" alt="Doorstep pickup" style="width:100%;height:100%;object-fit:cover" />
+            <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(6,35,27,.8),transparent)"></div>
+            <div style="position:absolute;left:20px;bottom:18px;color:#fff;font-weight:700;font-size:15px">Free pickup, anywhere in Bangladesh</div>
+          </div>
+        </div>
+
+        <div style="min-width:0;background:#f6faf7;border:1px solid #e2ece6;border-radius:24px;padding:clamp(20px,2.6vw,32px)">
+          <sc-if value="{{ bookingOpen }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <div style="display:flex;gap:6px;margin-bottom:8px">
+                <sc-for list="{{ stepBars }}" as="s" hint-placeholder-count="4">
+                  <div style="{{ s.style }}"></div>
+                </sc-for>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:12.5px;color:#7b8b84;margin-bottom:22px">
+                <span>Step {{ stepNum }} of 4</span><span style="font-weight:700;color:#00694b">{{ stepName }}</span>
+              </div>
+
+              <sc-if value="{{ atStep1 }}" hint-placeholder-val="{{ true }}">
+                <div style="display:grid;gap:16px">
+                  <div>
+                    <label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Direction</label>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                      <sc-for list="{{ bookDirTabs }}" as="d" hint-placeholder-count="2">
+                        <button onClick="{{ d.go }}" style="{{ d.style }}">{{ d.label }}</button>
+                      </sc-for>
+                    </div>
+                  </div>
+                  <div>
+                    <label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Service</label>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                      <sc-for list="{{ serviceTabs }}" as="s" hint-placeholder-count="3">
+                        <button onClick="{{ s.go }}" style="{{ s.style }}">{{ s.label }}</button>
+                      </sc-for>
+                    </div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px">
+                    <div><label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Preferred pickup date</label>
+                      <input type="date" value="{{ v_date }}" onChange="{{ on_date }}" style="width:100%;padding:13px;border-radius:12px;border:1.5px solid #dbe7e1;background:#fff;font-size:15px;outline:none" /></div>
+                    <div><label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Time slot</label>
+                      <select value="{{ v_slot }}" onChange="{{ on_slot }}" style="width:100%;padding:13px;border-radius:12px;border:1.5px solid #dbe7e1;background:#fff;font-size:15px;outline:none">
+                        <option value="morning">Morning · 9am–1pm</option>
+                        <option value="afternoon">Afternoon · 1pm–5pm</option>
+                        <option value="evening">Evening · 5pm–8pm</option>
+                      </select></div>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ atStep2 }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid;gap:16px">
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px">
+                    <div><label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Sender name</label>
+                      <input value="{{ v_senderName }}" onChange="{{ on_senderName }}" placeholder="Full name" style="width:100%;padding:13px;border-radius:12px;border:1.5px solid #dbe7e1;background:#fff;font-size:15px;outline:none" style-focus="border-color:#00694b" /></div>
+                    <div><label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Sender mobile</label>
+                      <input value="{{ v_senderPhone }}" onChange="{{ on_senderPhone }}" placeholder="+880…" style="width:100%;padding:13px;border-radius:12px;border:1.5px solid #dbe7e1;background:#fff;font-size:15px;outline:none" style-focus="border-color:#00694b" /></div>
+                  </div>
+                  <div><label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Pickup address</label>
+                    <textarea value="{{ v_senderAddr }}" onChange="{{ on_senderAddr }}" rows="2" placeholder="House, road, area, city" style="width:100%;padding:13px;border-radius:12px;border:1.5px solid #dbe7e1;background:#fff;font-size:15px;outline:none;resize:vertical" style-focus="border-color:#00694b"></textarea></div>
+                  <div style="height:1px;background:#e2ece6"></div>
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px">
+                    <div><label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Receiver name</label>
+                      <input value="{{ v_recName }}" onChange="{{ on_recName }}" placeholder="Full name" style="width:100%;padding:13px;border-radius:12px;border:1.5px solid #dbe7e1;background:#fff;font-size:15px;outline:none" style-focus="border-color:#00694b" /></div>
+                    <div><label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Receiver mobile</label>
+                      <input value="{{ v_recPhone }}" onChange="{{ on_recPhone }}" placeholder="04…" style="width:100%;padding:13px;border-radius:12px;border:1.5px solid #dbe7e1;background:#fff;font-size:15px;outline:none" style-focus="border-color:#00694b" /></div>
+                  </div>
+                  <div><label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Delivery address</label>
+                    <textarea value="{{ v_recAddr }}" onChange="{{ on_recAddr }}" rows="2" placeholder="Street, suburb, state, postcode" style="width:100%;padding:13px;border-radius:12px;border:1.5px solid #dbe7e1;background:#fff;font-size:15px;outline:none;resize:vertical" style-focus="border-color:#00694b"></textarea></div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ atStep3 }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid;gap:16px">
+                  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px">
+                    <div><label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Number of boxes</label>
+                      <input value="{{ v_boxes }}" onChange="{{ on_boxes }}" style="width:100%;padding:13px;border-radius:12px;border:1.5px solid #dbe7e1;background:#fff;font-size:15px;outline:none" /></div>
+                    <div><label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Approx. weight (kg)</label>
+                      <input value="{{ v_weight }}" onChange="{{ on_weight }}" style="width:100%;padding:13px;border-radius:12px;border:1.5px solid #dbe7e1;background:#fff;font-size:15px;outline:none" /></div>
+                  </div>
+                  <div><label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Contents</label>
+                    <select value="{{ v_cat }}" onChange="{{ on_cat }}" style="width:100%;padding:13px;border-radius:12px;border:1.5px solid #dbe7e1;background:#fff;font-size:15px;outline:none">
+                      <sc-for list="{{ categories }}" as="c" hint-placeholder-count="6">
+                        <option value="{{ c.id }}">{{ c.label }}</option>
+                      </sc-for>
+                    </select></div>
+                  <div><label style="display:block;font-size:13px;font-weight:700;color:#41544c;margin-bottom:7px">Packing list / handling notes</label>
+                    <textarea value="{{ v_notes }}" onChange="{{ on_notes }}" rows="3" placeholder="Quantity of each item, size of liquids (ml/g), number of sharee, kamiz, shirts, pants…" style="width:100%;padding:13px;border-radius:12px;border:1.5px solid #dbe7e1;background:#fff;font-size:15px;outline:none;resize:vertical"></textarea></div>
+                  <div style="background:#fdeef0;border:1px solid #f6ccd3;border-radius:12px;padding:14px 16px;font-size:13px;color:#8d1b2c;line-height:1.6">Prohibited: perfume, body spray, flammables, alcohol, cigarettes, gold, diamonds, currency, AA/AAA batteries, adult toys. Each box max 20 kg and under 1 metre.</div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ atStep4 }}" hint-placeholder-val="{{ false }}">
+                <div>
+                  <div style="background:#fff;border:1px solid #e2ece6;border-radius:16px;padding:20px">
+                    <sc-for list="{{ reviewLines }}" as="r" hint-placeholder-count="6">
+                      <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid #f0f5f2;font-size:14px">
+                        <span style="color:#7b8b84">{{ r.k }}</span><strong style="text-align:right">{{ r.v }}</strong>
+                      </div>
+                    </sc-for>
+                    <div style="display:flex;justify-content:space-between;gap:16px;padding:14px 0 0;font-size:17px;font-weight:800">
+                      <span>Estimated cost</span><span style="color:#c8102e">{{ quoteTotal }}</span>
+                    </div>
+                  </div>
+                  <label style="display:flex;gap:10px;align-items:flex-start;margin-top:16px;font-size:13.5px;color:#41544c;line-height:1.55;cursor:pointer">
+                    <input type="checkbox" checked="{{ v_agree }}" onChange="{{ on_agree }}" style="margin-top:3px;accent-color:#00694b;width:17px;height:17px" />
+                    <span>I confirm the packing list is complete and contains no prohibited items, and I accept BD-EX Cargo's shipping terms.</span>
+                  </label>
+                </div>
+              </sc-if>
+
+              <div style="display:flex;gap:10px;margin-top:26px;flex-wrap:wrap">
+                <sc-if value="{{ canBack }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ back }}" style="padding:14px 22px;border-radius:999px;border:1.5px solid #cfdcd6;background:#fff;color:#3a4d46;font-weight:700;font-size:15px;cursor:pointer" style-hover="border-color:#00694b;color:#00694b">Back</button>
+                </sc-if>
+                <button onClick="{{ next }}" style="flex:1 1 160px;padding:14px 24px;border-radius:999px;border:none;background:#c8102e;color:#fff;font-weight:700;font-size:15px;cursor:pointer" style-hover="background:#a50d25">{{ nextLabel }}</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ bookingDone }}" hint-placeholder-val="{{ false }}">
+            <div style="text-align:center;padding:24px 6px;animation:bdxUp .5s ease both">
+              <div style="width:62px;height:62px;border-radius:50%;background:#e7f5ed;color:#00694b;display:grid;place-items:center;font-size:26px;margin:0 auto 18px"><i class="fa-solid fa-circle-check"></i></div>
+              <h3 style="margin:0 0 8px;font-size:25px;letter-spacing:-.8px;font-weight:800">Booking received</h3>
+              <p style="margin:0 0 18px;font-size:15px;line-height:1.6;color:#41544c">We'll call your sender within 24 hours and email the box labels. Keep this reference handy.</p>
+              <div style="display:inline-block;background:#101f1a;color:#fff;padding:13px 24px;border-radius:12px;font-size:20px;font-weight:800;letter-spacing:1.4px">{{ bookingRef }}</div>
+              <div style="margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+                <button onClick="{{ reset }}" style="padding:13px 22px;border-radius:999px;border:1.5px solid #cfdcd6;background:#fff;font-weight:700;font-size:14.5px;cursor:pointer" style-hover="border-color:#00694b;color:#00694b">Make another booking</button>
+                <a href="#top" style="padding:13px 22px;border-radius:999px;background:#12457f;color:#fff;font-weight:700;font-size:14.5px" style-hover="background:#0d3564;color:#fff">Track this parcel</a>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <section id="how" style="max-width:1240px;margin:0 auto;padding:86px 20px">
+    <div style="text-align:center;max-width:620px;margin:0 auto 46px">
+      <span style="font-size:12px;font-weight:800;letter-spacing:3px;color:#c8102e">THE JOURNEY</span>
+      <h2 style="margin:14px 0 10px;font-size:clamp(30px,3.8vw,46px);letter-spacing:-1.6px;line-height:1.07;font-weight:800">Six stamped milestones</h2>
+      <p style="margin:0;font-size:17px;color:#5b6b64;line-height:1.6">Every step is stamped with date and time and fires a notification automatically — email, SMS, WhatsApp or app.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px">
+      <sc-for list="{{ journey }}" as="j" hint-placeholder-count="6">
+        <div style="background:#fff;border:1px solid #e6efea;border-radius:18px;padding:22px;position:relative;overflow:hidden;transition:transform .25s ease" style-hover="transform:translateY(-6px);border-color:#cfe4d8">
+          <span style="position:absolute;right:14px;top:8px;font-size:44px;font-weight:800;color:#f1f6f3;letter-spacing:-2px">{{ j.n }}</span>
+          <div style="position:relative;font-size:16px;font-weight:700;letter-spacing:-.3px">{{ j.t }}</div>
+          <p style="position:relative;margin:8px 0 0;font-size:13.5px;line-height:1.6;color:#5b6b64">{{ j.d }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ DROP OFF ============ -->
+  <section id="dropoff" style="background:linear-gradient(160deg,#12457f,#0b2f58);color:#fff;position:relative;overflow:hidden">
+    <div style="position:absolute;right:-60px;top:-40px;width:340px;height:340px;border-radius:50%;background:rgba(255,255,255,.06);animation:bdxFloat 9s ease-in-out infinite"></div>
+    <div style="position:relative;max-width:1240px;margin:0 auto;padding:86px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:46px">
+      <div style="min-width:0">
+        <span style="font-size:12px;font-weight:800;letter-spacing:3px;color:#9cc4ef">AUSTRALIA WIDE DROP-OFF</span>
+        <h2 style="margin:14px 0 16px;font-size:clamp(28px,3.6vw,44px);letter-spacing:-1.6px;line-height:1.08;font-weight:800;text-wrap:balance">Drop your box at any Australia Post outlet</h2>
+        <p style="margin:0 0 18px;font-size:17px;line-height:1.7;color:#cadcf0">4,500+ outlets are our authorised partners. Time convenient, no hassle, and no postage fee when your parcel is 15 kg or more.</p>
+        <div style="display:grid;gap:12px">
+          <sc-for list="{{ dropRules }}" as="d" hint-placeholder-count="4">
+            <div style="display:flex;gap:12px;align-items:flex-start;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:14px 16px">
+              <span style="color:#7fd3ae;flex:0 0 auto;font-size:14px;margin-top:2px"><i class="fa-solid fa-circle-check"></i></span>
+              <span style="font-size:14.5px;line-height:1.6;color:#e7f0fa">{{ d }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-top:22px;font-size:14.5px;color:#cadcf0">Questions? Call <a href="tel:0411123393" style="color:#fff;font-weight:700">0411 123 393</a> or <a href="tel:0406524252" style="color:#fff;font-weight:700">0406 524 252</a>.</div>
+      </div>
+      <div style="min-width:0;background:#fff;color:#101f1a;border-radius:24px;padding:clamp(22px,2.6vw,32px);box-shadow:0 30px 70px rgba(0,0,0,.3)">
+        <h3 style="margin:0 0 6px;font-size:20px;font-weight:800;letter-spacing:-.5px">Request your box labels</h3>
+        <p style="margin:0 0 20px;font-size:14px;color:#5b6b64;line-height:1.6">Send these details and we'll email a printable label for each box.</p>
+        <div style="display:grid;gap:12px">
+          <sc-for list="{{ labelFields }}" as="f" hint-placeholder-count="6">
+            <div style="display:grid;grid-template-columns:minmax(0,130px) minmax(0,1fr);gap:12px;align-items:center;background:#f6faf7;border:1px solid #e2ece6;border-radius:12px;padding:12px 14px">
+              <span style="font-size:13px;font-weight:700;color:#41544c">{{ f.k }}</span>
+              <span style="font-size:13.5px;color:#8a9a93">{{ f.v }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="margin-top:18px;background:#fff8e9;border:1px solid #f2e0b8;border-radius:12px;padding:13px 15px;font-size:13px;color:#6b5320;line-height:1.6">Extra $15 applies per box under 15 kg. Max 20 kg and 1 metre per box.</div>
+        <a href="#booking" style="display:block;text-align:center;margin-top:18px;padding:14px;border-radius:999px;background:#c8102e;color:#fff;font-weight:700;font-size:15px" style-hover="background:#a50d25;color:#fff">Request labels online</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TERMS ============ -->
+  <section id="terms" style="max-width:1240px;margin:0 auto;padding:86px 20px">
+    <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:end;justify-content:space-between;margin-bottom:36px">
+      <div style="min-width:0">
+        <span style="font-size:12px;font-weight:800;letter-spacing:3px;color:#c8102e">SHIPPING TERMS</span>
+        <h2 style="margin:14px 0 0;font-size:clamp(30px,3.8vw,46px);letter-spacing:-1.6px;line-height:1.06;font-weight:800">Australia to Bangladesh</h2>
+      </div>
+      <a href="#faq" style="font-weight:700;font-size:15px;color:#00694b" style-hover="color:#c8102e">Read the FAQ →</a>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:0 52px;border-top:2px solid #16241f;background:#fff">
+      <sc-for list="{{ terms }}" as="t" hint-placeholder-count="10">
+        <div style="display:grid;grid-template-columns:26px 1fr;gap:14px;align-items:start;padding:17px 18px 17px 16px;border-bottom:1px solid #e9f0ec;min-width:0;transition:background .2s ease" style-hover="background:#f7fbf8">
+          <span style="{{ t.badge }}"><i class="{{ t.fa }}"></i></span>
+          <span style="font-size:14.5px;line-height:1.6;color:#2e403a">{{ t.text }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ WHY / TESTIMONIALS ============ -->
+  <section style="background:#fff;border-top:1px solid #e9f1ec">
+    <div style="max-width:1240px;margin:0 auto;padding:86px 20px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:40px;align-items:center">
+        <div style="min-width:0">
+          <span style="font-size:12px;font-weight:800;letter-spacing:3px;color:#c8102e">WHY BD-EX</span>
+          <h2 style="margin:14px 0 18px;font-size:clamp(30px,3.8vw,44px);letter-spacing:-1.6px;line-height:1.07;font-weight:800;text-wrap:balance">Two countries, one platform, zero guesswork</h2>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:2px 26px;border-top:1px solid #e3ece7">
+            <sc-for list="{{ why }}" as="w" hint-placeholder-count="6">
+              <div style="min-width:0;display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:start;padding:15px 0;border-bottom:1px solid #e3ece7">
+                <span style="width:30px;height:30px;border-radius:50%;background:#eef6f1;color:#00694b;display:grid;place-items:center;font-size:13px"><i class="{{ w.fa }}"></i></span>
+                <div style="min-width:0">
+                  <div style="font-size:14.5px;font-weight:700">{{ w.t }}</div>
+                  <div style="font-size:13px;color:#5b6b64;line-height:1.5;margin-top:2px">{{ w.d }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="min-width:0">
+          <sc-for list="{{ quotes }}" as="q" hint-placeholder-count="1">
+            <div style="{{ q.wrap }}">
+              <div style="font-size:34px;color:#c8102e;line-height:1">“</div>
+              <p style="margin:6px 0 20px;font-size:18px;line-height:1.65;color:#22332d;text-wrap:pretty">{{ q.text }}</p>
+              <div style="display:flex;align-items:center;gap:12px">
+                <span style="{{ q.avatar }}"></span>
+                <div><div style="font-size:14.5px;font-weight:700">{{ q.name }}</div><div style="font-size:12.5px;color:#8a9a93">{{ q.city }}</div></div>
+              </div>
+            </div>
+          </sc-for>
+          <div style="display:flex;gap:8px;margin-top:18px">
+            <sc-for list="{{ quoteDots }}" as="d" hint-placeholder-count="3">
+              <button onClick="{{ d.go }}" aria-label="testimonial" style="{{ d.style }}"></button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section id="faq" style="max-width:900px;margin:0 auto;padding:86px 20px">
+    <div style="text-align:center;margin-bottom:38px">
+      <span style="font-size:12px;font-weight:800;letter-spacing:3px;color:#c8102e">QUESTIONS</span>
+      <h2 style="margin:14px 0 0;font-size:clamp(28px,3.4vw,42px);letter-spacing:-1.4px;font-weight:800">Frequently asked</h2>
+    </div>
+    <div style="display:grid;gap:12px">
+      <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="6">
+        <div style="background:#fff;border:1px solid #e6efea;border-radius:16px;overflow:hidden">
+          <button onClick="{{ f.toggle }}" style="width:100%;display:flex;justify-content:space-between;gap:16px;align-items:center;padding:20px 22px;background:none;border:none;cursor:pointer;text-align:left;font-size:16px;font-weight:700;color:#101f1a">
+            <span>{{ f.q }}</span><span style="{{ f.icon }}">+</span>
+          </button>
+          <div style="{{ f.body }}"><p style="margin:0;padding:0 22px 22px;font-size:14.5px;line-height:1.7;color:#5b6b64">{{ f.a }}</p></div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section style="position:relative;overflow:hidden;background:#06231b">
+    <img src="https://picsum.photos/seed/bdexcargohold/1800/700" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.22" />
+    <div style="position:relative;max-width:900px;margin:0 auto;padding:96px 20px;text-align:center">
+      <h2 style="margin:0 0 14px;color:#fff;font-size:clamp(30px,4.4vw,52px);letter-spacing:-2px;line-height:1.04;font-weight:800;text-wrap:balance">Ready to send your parcel home?</h2>
+      <p style="margin:0 auto 30px;max-width:560px;color:#b7d5c7;font-size:17px;line-height:1.6">Book online in minutes. Free pickup, free packaging, live tracking, home delivery.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="#booking" style="padding:16px 30px;border-radius:999px;background:#c8102e;color:#fff;font-weight:700;font-size:16px" style-hover="background:#fff;color:#c8102e">Book a pickup</a>
+        <a href="tel:0411123393" style="padding:16px 30px;border-radius:999px;border:1.5px solid rgba(255,255,255,.4);color:#fff;font-weight:700;font-size:16px" style-hover="background:rgba(255,255,255,.14);color:#fff">Call 0411 123 393</a>
+      </div>
+    </div>
+  </section>
+
+  <a href="tel:0411123393" style="position:fixed;right:18px;bottom:18px;z-index:80;display:flex;align-items:center;gap:10px;padding:14px 20px;border-radius:999px;background:#c8102e;color:#fff;font-weight:700;font-size:15px;box-shadow:0 14px 34px rgba(200,16,46,.4);transition:all .2s ease" style-hover="background:#00694b;color:#fff;transform:translateY(-2px)">
+    <i class="fa-solid fa-phone-volume"></i>Call us
+  </a>
+
+  <!-- ============ FOOTER ============ -->
+  <footer style="background:#0d2b22;color:#a9c6b8">
+    <div style="{{ footerGrid }}">
+      <div style="{{ footerBrand }}">
+        <div style="display:inline-flex;align-items:center;background:#fff;border-radius:12px;padding:10px 14px;margin-bottom:16px">
+          <img src="assets/bdex-logo.png" alt="BD-EX Cargo" style="height:40px;width:auto;display:block" />
+        </div>
+        <p style="margin:0;font-size:14px;line-height:1.7">Air freight and courier between Australia and Bangladesh. Daily shipments, transparent pricing, door to door.</p>
+      </div>
+      <sc-for list="{{ footerCols }}" as="c" hint-placeholder-count="3">
+        <div style="min-width:0">
+          <div style="color:#fff;font-size:13px;font-weight:800;letter-spacing:1.6px;margin-bottom:14px">{{ c.title }}</div>
+          <div style="display:grid;gap:9px">
+            <sc-for list="{{ c.items }}" as="i" hint-placeholder-count="4">
+              <a href="{{ i.href }}" style="font-size:14px;color:#a9c6b8" style-hover="color:#fff">{{ i.label }}</a>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,.1);margin-top:22px">
+      <div style="max-width:1240px;margin:0 auto;padding:18px 20px;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;font-size:13px">
+        <span>© 2026 BD-EX Cargo. All rights reserved.</span>
+        <span>www.bdexcargo.com.au · 0411 123 393</span>
+      </div>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
+const CATS = [
+  {id:'general', label:'General Goods — household, baby food, clothing, shoes, dry food', nsw:17, other:18, type:'kg'},
+  {id:'electrical', label:'Electrical Appliances', nsw:17, other:18, type:'kg', extra:15, extraNote:'Per-item surcharge (>$100 item)'},
+  {id:'medical', label:'Blood Sugar / BP Device', nsw:17, other:18, type:'kg', extra:20, extraNote:'Per-item surcharge'},
+  {id:'toiletries', label:'Toiletries — shampoo, lotion, toothpaste, cream', nsw:20, other:20, type:'kg'},
+  {id:'makeup', label:'Makeup & Beauty Products', nsw:25, other:25, type:'kg'},
+  {id:'vitamin', label:'Vitamin & Supplement', nsw:27, other:27, type:'kg'},
+  {id:'auto', label:'Automobile Parts & Car Accessories', nsw:30, other:30, type:'kg'},
+  {id:'tech', label:'Tech Items & Computer Equipment', nsw:35, other:35, type:'kg'},
+  {id:'dslr', label:'DSLR Camera, iPad or Tab (up to 1 kg)', flat:100, type:'flat'},
+  {id:'console', label:'Gaming Console — XBOX / PS (up to 2.5 kg)', flat:120, type:'flat'},
+  {id:'laptop', label:'Laptop (up to 2.5 kg)', flat:150, type:'flat'},
+  {id:'watch', label:'Smart Watch (per piece)', flat:85, type:'flat'},
+  {id:'airpods', label:'AirPods / Buds (per piece)', flat:50, type:'flat'}
+];
+
+const BD_TIERS = [
+  {max:1, rate:44, w:'1'},{max:2, rate:33, w:'2'},{max:3, rate:29, w:'3'},{max:4, rate:27, w:'4'},
+  {max:5, rate:26, w:'5'},{max:6, rate:25, w:'6'},{max:7, rate:24, w:'7'},{max:8, rate:23.5, w:'8'},
+  {max:9, rate:22.8, w:'9'},{max:10, rate:22.5, w:'10'},{max:15, rate:21, w:'10.1 – 15'},
+  {max:20, rate:20, w:'15.1 – 20'},{max:30, rate:19, w:'20.1 – 30'},{max:50, rate:18, w:'30.1 – 50'},
+  {max:70, rate:17, w:'50.1 – 70'},{max:9999, rate:15, w:'70+'}
+];
+
+const SLIDES = [
+  {img:'https://picsum.photos/seed/bdexcargo1/1800/1000', title:'Air freight', h:'Your parcel home in<br>6–9 business days.', s:'Free pickup anywhere in Bangladesh, free box and packaging, live tracking, and home delivery to any corner of Australia.'},
+  {img:'https://picsum.photos/seed/bdexcargo2/1800/1000', title:'Warehouse', h:'Book online.<br>Skip the phone call.', s:'A shipment goes out without a WhatsApp thread or an office visit. Instant quote, pickup slot, label emailed to you.'},
+  {img:'https://picsum.photos/seed/bdexcargo3/1800/1000', title:'Drop off', h:'4,500 Australia Post<br>outlets, one partner.', s:'Drop your box at any Australia Post outlet. No postage fee on parcels 15 kg and over — just print the label we email you.'}
+];
+
+const QUOTES = [
+  {text:'Sent four boxes from Dhaka to Melbourne. The pickup team called the next morning and everything arrived in eight days, nothing missing.', name:'Rizwana H.', city:'Melbourne, VIC', img:'https://picsum.photos/seed/bdexperson1/200/200'},
+  {text:'The price calculator matched the invoice to the dollar. No surprise fees at either end, which is rare in this business.', name:'Shakib A.', city:'Sydney, NSW', img:'https://picsum.photos/seed/bdexperson2/200/200'},
+  {text:'Dropped two 18 kg boxes at my local post office on a Saturday and paid nothing extra. Tracking updated at every step.', name:'Nasrin K.', city:'Brisbane, QLD', img:'https://picsum.photos/seed/bdexperson3/200/200'}
+];
+
+const FAQS = [
+  {q:'How do I book a pickup in Bangladesh?', a:'Use the online booking form on this page, or SMS 0411 123 393 with the sender and receiver name, address and mobile number. Our Dhaka office pickup team calls your sender within 24 hours and arranges a free pickup from anywhere in Bangladesh.'},
+  {q:'What does it cost to send a parcel from Australia to Bangladesh?', a:'General goods are $17/kg from NSW and $18/kg from ACT, VIC, QLD, SA, WA and TAS, plus a $35 airport fee per shipment. Toiletries, makeup, supplements, auto parts and tech items have their own per-kg rates — see the full rate card above.'},
+  {q:'How long does delivery take?', a:'Bangladesh to Australia is 6–9 business days (estimated 4+ business days for express garment shipments). Australia to Bangladesh is 10–18 working days from the flight date, including customs clearance and home delivery.'},
+  {q:'What cannot go in the box?', a:'No perfume, body spray, flammable items, alcohol, cigarettes, gold, diamonds, currency, AA or AAA batteries or adult toys. Undeclared prohibited items are the customer’s responsibility and will be charged.'},
+  {q:'Is my parcel covered if something is lost or damaged?', a:'Up to $50 money back applies to lost, stolen or damaged products. A full refund is processed if you purchase Product Cover Insurance at booking.'},
+  {q:'Can I pay in Bangladesh instead of Australia?', a:'Yes. Payment can be made on either side — Bangladesh or Australia — in BDT or AUD, whichever suits you and your sender.'}
+];
+
+class Component extends DCLogic {
+  state = {
+    slide: 0, quote: 0,
+    dir: 'ausbd', st: 'nsw', cat: 'general', weight: '10', itemType: 'garments',
+    rateTab: 'ausbd', faq: 0,
+    track: '', trackRes: null,
+    step: 1, done: false, ref: '',
+    vw: typeof window !== 'undefined' ? window.innerWidth : 1280, menu: false,
+    b: {senderName:'', senderPhone:'', senderAddr:'', recName:'', recPhone:'', recAddr:'', boxes:'2', notes:'', date:'2026-09-15', slot:'morning', service:'standard', agree:false}
+  };
+
+  componentDidMount() {
+    this.t1 = setInterval(() => this.setState(s => ({slide: (s.slide + 1) % SLIDES.length})), 9000);
+    this.t2 = setInterval(() => this.setState(s => ({quote: (s.quote + 1) % QUOTES.length})), 7000);
+    this.io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('bdx-seen');
+        this.io.unobserve(e.target);
+      });
+    }, {rootMargin: '0px 0px -8% 0px', threshold: 0.06});
+    this.tagReveals();
+    this.t3 = [400, 1400, 3000].map(ms => setTimeout(() => this.tagReveals(), ms));
+    this.onResize = () => this.setState({vw: window.innerWidth});
+    window.addEventListener('resize', this.onResize);
+  }
+  tagReveals() {
+    const sel = 'section > div > div, section > div > h2, section > div > p, footer > div > div';
+    Array.prototype.slice.call(document.querySelectorAll(sel)).forEach((n, i) => {
+      if (n.hasAttribute('data-reveal') || n.closest('#top')) return;
+      n.setAttribute('data-reveal', '');
+      n.style.animationDelay = ((i % 4) * 0.08) + 's';
+      this.io.observe(n);
+    });
+  }
+  componentWillUnmount() {
+    clearInterval(this.t1); clearInterval(this.t2);
+    (this.t3 || []).forEach(clearTimeout);
+    if (this.io) this.io.disconnect();
+    if (this.onResize) window.removeEventListener('resize', this.onResize);
+  }
+
+  setB(k, v) { this.setState(s => ({b: Object.assign({}, s.b, {[k]: v})})); }
+
+  pill(active, accent) {
+    const a = accent || '#00694b';
+    return 'padding:11px 17px;border-radius:11px;border:1.5px solid ' + (active ? a : '#dbe7e1') +
+      ';background:' + (active ? a : '#fff') + ';color:' + (active ? '#fff' : '#41544c') +
+      ';font-weight:700;font-size:14px;cursor:pointer;transition:all .2s ease;flex:0 1 auto';
+  }
+  tab(active) {
+    return 'flex:1;padding:13px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:700;font-size:14.5px;transition:all .22s ease;background:' +
+      (active ? '#fff' : 'transparent') + ';color:' + (active ? '#c8102e' : '#5b6b64') +
+      ';box-shadow:' + (active ? '0 3px 10px rgba(16,31,26,.1)' : 'none');
+  }
+
+  quote() {
+    const w = Math.max(0.5, parseFloat(this.state.weight) || 0);
+    const lines = [];
+    let total = 0, eta = '';
+    if (this.state.dir === 'ausbd') {
+      const c = CATS.find(x => x.id === this.state.cat) || CATS[0];
+      if (c.type === 'flat') {
+        total = c.flat;
+        lines.push({label: c.label.split(' —')[0] + ' (flat rate)', value: '$' + c.flat});
+      } else {
+        const rate = this.state.st === 'nsw' ? c.nsw : c.other;
+        const freight = rate * w;
+        total = freight;
+        lines.push({label: 'Freight · ' + w + ' kg × $' + rate + '/kg', value: '$' + freight.toFixed(2)});
+        if (c.extra) { total += c.extra; lines.push({label: c.extraNote, value: '$' + c.extra}); }
+      }
+      total += 35;
+      lines.push({label: 'Airport fee per shipment', value: '$35'});
+      lines.push({label: 'Customs clearance + home delivery', value: 'Included'});
+      eta = '10–18 working days from flight date · ' + (this.state.st === 'nsw' ? 'NSW' : 'ACT/VIC/QLD/SA/WA/TAS') + ' → Bangladesh';
+    } else {
+      const tier = BD_TIERS.find(t => w <= t.max);
+      const freight = tier.rate * w;
+      total = freight;
+      lines.push({label: 'Freight · ' + w + ' kg × $' + tier.rate + '/kg', value: '$' + freight.toFixed(2)});
+      lines.push({label: 'Pickup in Bangladesh + packaging', value: 'Free'});
+      if (this.state.itemType === 'non-garments') {
+        const h = Math.max(20, w * 2);
+        total += h;
+        lines.push({label: 'Non-garments handling charge', value: '$' + h.toFixed(2)});
+      }
+      lines.push({label: 'Home delivery in Australia', value: 'Free'});
+      eta = '6–9 business days · Bangladesh → anywhere in Australia';
+    }
+    return {total: '$' + total.toFixed(2), lines: lines, eta: eta};
+  }
+
+  next() {
+    if (this.state.step < 4) { this.setState(s => ({step: s.step + 1})); return; }
+    const ref = 'BDX-' + Math.floor(1000000 + Math.random() * 8999999);
+    this.setState({done: true, ref: ref});
+  }
+
+  doTrack() {
+    const v = (this.state.track || '').trim();
+    if (!v) { this.setState({trackRes: 'empty'}); return; }
+    this.setState({trackRes: {ref: v.toUpperCase(), at: 3}});
+  }
+
+  renderVals() {
+    const q = this.quote();
+    const s = this.state;
+    const b = s.b;
+
+    const binds = {};
+    ['senderName','senderPhone','senderAddr','recName','recPhone','recAddr','boxes','notes','date','slot'].forEach(k => {
+      binds['v_' + k] = b[k];
+      binds['on_' + k] = e => this.setB(k, e.target.value);
+    });
+
+    const trackStepNames = [
+      ['Booked', 'Fri 11 Sep · 09:12 · Dhaka'],
+      ['Picked up', 'Fri 11 Sep · 16:40 · Uttara, Dhaka'],
+      ['In warehouse', 'Sat 12 Sep · 08:05 · Dhaka hub'],
+      ['In transit', 'Sun 13 Sep · 23:30 · Flight to Sydney'],
+      ['Customs', 'Pending'],
+      ['Delivered', 'Pending']
+    ];
+    const at = s.trackRes && s.trackRes !== 'empty' ? s.trackRes.at : 0;
+
+    const stepNames = ['Service', 'Addresses', 'Parcel', 'Review'];
+
+    const reviewLines = [
+      {k:'Direction', v: s.dir === 'ausbd' ? 'Australia → Bangladesh' : 'Bangladesh → Australia'},
+      {k:'Service', v: b.service},
+      {k:'Pickup', v: (b.date || 'date not set') + ' · ' + b.slot},
+      {k:'Sender', v: (b.senderName || '—') + ' · ' + (b.senderPhone || '—')},
+      {k:'Receiver', v: (b.recName || '—') + ' · ' + (b.recPhone || '—')},
+      {k:'Parcel', v: b.boxes + ' box(es) · ' + s.weight + ' kg'}
+    ];
+
+    const mob = s.vw < 900;
+    const bar = 'width:20px;height:2px;background:#16241f;display:block;transition:transform .25s ease,opacity .2s ease';
+
+    return Object.assign(binds, {
+      heroGrid: 'position:relative;z-index:3;max-width:1240px;margin:0 auto;width:100%;box-sizing:border-box;display:grid;align-items:center;padding:' +
+        (mob ? '48px 18px 88px' : '72px 20px 110px') + ';gap:' + (mob ? '28px' : '48px') +
+        ';grid-template-columns:' + (mob ? 'minmax(0,1fr)' : 'repeat(auto-fit,minmax(320px,1fr))'),
+      isMobile: mob,
+      isDesktop: !mob,
+      toggleMenu: () => this.setState(x => ({menu: !x.menu})),
+      closeMenu: () => this.setState({menu: false}),
+      burger1: bar + (s.menu ? ';transform:translateY(7px) rotate(45deg)' : ''),
+      burger2: bar + (s.menu ? ';opacity:0' : ''),
+      burger3: bar + (s.menu ? ';transform:translateY(-7px) rotate(-45deg)' : ''),
+      drawerStyle: 'overflow:hidden;background:#fff;border-top:1px solid #eef2ef;transition:max-height .34s ease,opacity .24s ease;max-height:' +
+        (mob && s.menu ? '520px' : '0') + ';opacity:' + (mob && s.menu ? 1 : 0),
+      navLinks: [
+        {href:'#about', label:'About us'}, {href:'#solutions', label:'Services'},
+        {href:'#calculator', label:'Calculator'}, {href:'#rates', label:'Rates'},
+        {href:'#top', label:'Track order'}, {href:'#dropoff', label:'Drop-off'},
+        {href:'#faq', label:'FAQ'}
+      ],
+      aboutTags: [
+        {fa:'fa-solid fa-plane-departure', label:'Serving Australia since 2012'},
+        {fa:'fa-solid fa-warehouse', label:'Drop-off stations in Sydney, NY & NJ'},
+        {fa:'fa-solid fa-globe', label:'A decade of UK express shipping'}
+      ],
+      assurances: [
+        {n:'100%', l:'Your goods are insured on every consolidated shipment'},
+        {n:'Cash back', l:'Refund offered if a product is damaged or stolen in transit'},
+        {n:'64', l:'Districts of Bangladesh covered by free home delivery'},
+        {n:'Free', l:'Send your parcel to our Sydney head office at no charge'}
+      ],
+      solutions: [
+        {fa:'fa-solid fa-building', t:'Corporate needs', d:'Register a business account and start sending — consolidated freight, itemised invoicing and contract rates.', img:'https://picsum.photos/seed/bdexcorporate/800/500'},
+        {fa:'fa-solid fa-user', t:'Personal needs', d:'You pick the service, the delivery time and the price. Free pickup in Bangladesh, home delivery in Australia.', img:'https://picsum.photos/seed/bdexpersonal/800/500'},
+        {fa:'fa-solid fa-store', t:'Online store needs', d:'Automate your sales with bulk label creation, tracking numbers per order and a seller dashboard.', img:'https://picsum.photos/seed/bdexstore/800/500'}
+      ].map(x => Object.assign({}, x, {
+        photo: 'height:168px;background-image:url(' + x.img + ');background-size:cover;background-position:center;border-bottom:1px solid #e2ece6'
+      })),
+
+      slides: SLIDES.map((x, i) => ({
+        img: x.img, title: x.title,
+        wrapStyle: 'position:absolute;inset:0;background-image:url(' + x.img + ');background-size:cover;background-position:center;transition:opacity 2.4s cubic-bezier(.4,0,.2,1),transform 11s linear;opacity:' +
+          (i === s.slide ? 1 : 0) + ';transform:scale(' + (i === s.slide ? 1.07 : 1) + ')'
+      })),
+      slideDots: SLIDES.map((x, i) => ({
+        go: () => this.setState({slide: i}),
+        style: 'width:' + (i === s.slide ? '38px' : '12px') + ';height:5px;border-radius:999px;border:none;cursor:pointer;transition:all .3s ease;background:' + (i === s.slide ? '#c8102e' : 'rgba(255,255,255,.4)')
+      })),
+
+      marquee: ['FREE PICKUP ALL OVER BANGLADESH','·','FREE BOX & PACKAGING','·','LIVE TRACKING','·','6–9 BUSINESS DAYS','·','HOME DELIVERY AUSTRALIA WIDE','·','PAY IN BD OR AUS','·','DAILY SHIPMENTS','·','FREE PICKUP ALL OVER BANGLADESH','·','FREE BOX & PACKAGING','·','LIVE TRACKING','·','6–9 BUSINESS DAYS','·','HOME DELIVERY AUSTRALIA WIDE','·','PAY IN BD OR AUS','·','DAILY SHIPMENTS','·'],
+
+      stats: [
+        {n:'4,500+', l:'Australia Post outlets as authorised drop-off partners'},
+        {n:'6–9', l:'Business days, Bangladesh to Australia'},
+        {n:'$17/kg', l:'From NSW for general goods, Australia to Bangladesh'},
+        {n:'Daily', l:'Shipments leaving Bangladesh, every working day'}
+      ],
+
+      heroChips: ['Free pickup', 'Free packaging', 'Live tracking', 'Home delivery', 'Pay either side'],
+
+      benefits: [
+        {fa:'fa-solid fa-house-circle-check', en:'Free pickup, anywhere in Bangladesh', d:'Our Dhaka team collects from any address in the country — no courier office visit.'},
+        {fa:'fa-solid fa-box-open', en:'Free box and packaging', d:'We bring the box and pack it properly, at no charge.'},
+        {fa:'fa-solid fa-location-crosshairs', en:'Live tracking', d:'Follow your parcel through all six milestones from your phone.'},
+        {fa:'fa-solid fa-plane-up', en:'6–9 working day delivery', d:'Daily flights out of Bangladesh keep transit times short.'},
+        {fa:'fa-solid fa-truck-fast', en:'Home delivery Australia wide', d:'Delivered to the door in any state or territory.'},
+        {fa:'fa-solid fa-money-bill-transfer', en:'Pay in Bangladesh or Australia', d:'Settle in BDT or AUD, whichever side is easier for you.'},
+        {fa:'fa-solid fa-calendar-day', en:'Shipments every day', d:'Bookings taken 24/7 online and dispatched each working day.'},
+        {fa:'fa-solid fa-headset', en:'Real people on the phone', d:'Call 0411 123 393 any time you want a human answer.'}
+      ],
+
+      dirTabs: [
+        {label:'Australia → Bangladesh', go: () => this.setState({dir:'ausbd'}), style: this.tab(s.dir === 'ausbd')},
+        {label:'Bangladesh → Australia', go: () => this.setState({dir:'bdaus'}), style: this.tab(s.dir === 'bdaus')}
+      ],
+      stateTabs: [
+        {label:'NSW', go: () => this.setState({st:'nsw'}), style: this.pill(s.st === 'nsw')},
+        {label:'ACT · VIC · QLD · SA · WA · TAS', go: () => this.setState({st:'other'}), style: this.pill(s.st === 'other')}
+      ],
+      itemTypeTabs: [
+        {label:'Garments', go: () => this.setState({itemType:'garments'}), style: this.pill(s.itemType === 'garments')},
+        {label:'Non-garments', go: () => this.setState({itemType:'non-garments'}), style: this.pill(s.itemType === 'non-garments', '#c8102e')}
+      ],
+      isAusBd: s.dir === 'ausbd',
+      isBdAus: s.dir === 'bdaus',
+      needsWeight: !(s.dir === 'ausbd' && (CATS.find(x => x.id === s.cat) || {}).type === 'flat'),
+      categories: CATS,
+      v_cat: s.cat,
+      on_cat: e => this.setState({cat: e.target.value}),
+      v_weight: s.weight,
+      on_weight: e => this.setState({weight: e.target.value}),
+      weightLabel: (parseFloat(s.weight) || 0) + ' kg',
+      quoteTotal: q.total,
+      quoteLines: q.lines,
+      quoteEta: q.eta,
+
+      rateTabs: [
+        {label:'Australia → Bangladesh', go: () => this.setState({rateTab:'ausbd'}), style: this.pill(s.rateTab === 'ausbd', '#c8102e')},
+        {label:'Bangladesh → Australia', go: () => this.setState({rateTab:'bdaus'}), style: this.pill(s.rateTab === 'bdaus', '#c8102e')},
+        {label:'Sending a TV to Bangladesh', go: () => this.setState({rateTab:'tv'}), style: this.pill(s.rateTab === 'tv', '#c8102e')}
+      ],
+      showAusBdTable: s.rateTab === 'ausbd',
+      showBdAusTable: s.rateTab === 'bdaus',
+      showTvTable: s.rateTab === 'tv',
+
+      ausBdRows: [
+        {name:'General Goods', note:'Household items, baby food, powder milk, clothing, shoes, chocolates, dry foods, leather items, books', nsw:'$17/kg', other:'$18/kg'},
+        {name:'Electrical Appliances', note:'$15 & $20 extra for each item over $100', nsw:'$17/kg', other:'$18/kg'},
+        {name:'Blood Sugar / BP Device', note:'$20 extra for each item', nsw:'$17/kg', other:'$18/kg'},
+        {name:'Toiletries', note:'Shampoo, lotion, toothpaste, face wash, cream, conditioner', nsw:'$20/kg', other:'$20/kg'},
+        {name:'Makeup & Beauty Products', note:'Lipstick, serum, eyeshadow palette, makeup palette, eyeliner, foundation', nsw:'$25/kg', other:'$25/kg'},
+        {name:'Vitamin & Supplement', note:'', nsw:'$27/kg', other:'$27/kg'},
+        {name:'Automobile Parts & Car Accessories', note:'', nsw:'$30/kg', other:'$30/kg'},
+        {name:'Tech Items & Computer Equipment', note:'', nsw:'$35/kg', other:'$35/kg'},
+        {name:'DSLR Camera, iPad & Tab', note:'Up to 1 kg', nsw:'$100', other:'$100'},
+        {name:'Gaming Console — XBOX / PS', note:'Up to 2.5 kg', nsw:'$120', other:'$120'},
+        {name:'Laptop', note:'Up to 2.5 kg', nsw:'$150', other:'$150'},
+        {name:'Smart Watch', note:'Per piece', nsw:'$85', other:'$85'},
+        {name:'AirPods / Buds', note:'Per piece', nsw:'$50', other:'$50'}
+      ].map((r, i) => Object.assign({}, r, {
+        rowStyle: 'display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr) minmax(0,1fr);align-items:center;border-top:1px solid #f0f5f2;background:' + (i % 2 ? '#fbfdfc' : '#fff')
+      })),
+
+      bdAusRows: BD_TIERS.map((t, i) => ({
+        w: t.w, p: '$' + t.rate,
+        rowStyle: 'display:grid;grid-template-columns:1fr 1fr;align-items:center;border-top:1px solid #f0f5f2;background:' + (i % 2 ? '#fbfdfc' : '#fff')
+      })),
+
+      tvCards: [
+        {size:'55"', lines:[{k:'Freight',v:'$17/kg'},{k:'Pallet weight',v:'10–15 kg'},{k:'Airport processing',v:'$35'},{k:'Volume fee',v:'$145'},{k:'BD govt duty',v:'BDT 70,000'},{k:'Local home delivery',v:'BDT 2,000'}]},
+        {size:'65"', lines:[{k:'Freight',v:'$17/kg'},{k:'Pallet weight',v:'10–15 kg'},{k:'Airport processing',v:'$35'},{k:'Volume fee',v:'$170'},{k:'BD govt duty',v:'BDT 70,000'},{k:'Local home delivery',v:'BDT 2,000'}]},
+        {size:'75"', lines:[{k:'Freight',v:'$17/kg'},{k:'Pallet weight',v:'10–15 kg'},{k:'Airport processing',v:'$35'},{k:'Volume fee',v:'$220'},{k:'BD govt duty',v:'BDT 90,000'},{k:'Local home delivery',v:'BDT 5,000'}]},
+        {size:'85"', lines:[{k:'Freight',v:'$17/kg'},{k:'Pallet weight',v:'10–15 kg'},{k:'Airport processing',v:'$35'},{k:'Volume fee',v:'$250'},{k:'BD govt duty',v:'BDT 90,000'},{k:'Local home delivery',v:'BDT 5,000'}]}
+      ],
+      tvTax: [
+        {size:'28"–32"', tax:'BDT 10,000'},{size:'33"–37"', tax:'BDT 15,000'},{size:'38"–42"', tax:'BDT 20,000'},
+        {size:'43"–47"', tax:'BDT 30,000'},{size:'48"–52"', tax:'BDT 50,000'},{size:'53"–65"', tax:'BDT 70,000'},
+        {size:'66"+', tax:'BDT 90,000'}
+      ],
+
+      bookingPerks: [
+        'Free pickup from any address in Bangladesh, arranged within 24 hours',
+        'Free box and packaging — we bring it to your sender',
+        'Instant quote before you confirm, itemised to the dollar',
+        'Tracking number and printable labels emailed straight away'
+      ],
+      bookingOpen: !s.done,
+      bookingDone: s.done,
+      bookingRef: s.ref,
+      stepNum: s.step,
+      stepName: stepNames[s.step - 1],
+      stepBars: [1,2,3,4].map(n => ({
+        style: 'flex:1;height:5px;border-radius:999px;transition:background .3s ease;background:' + (n <= s.step ? '#c8102e' : '#e2ece6')
+      })),
+      atStep1: s.step === 1, atStep2: s.step === 2, atStep3: s.step === 3, atStep4: s.step === 4,
+      canBack: s.step > 1,
+      nextLabel: s.step === 4 ? 'Confirm booking' : 'Continue',
+      next: () => this.next(),
+      back: () => this.setState(x => ({step: Math.max(1, x.step - 1)})),
+      reset: () => this.setState({done:false, step:1}),
+      bookDirTabs: [
+        {label:'Bangladesh → Australia', go: () => this.setState({dir:'bdaus'}), style: this.pill(s.dir === 'bdaus')},
+        {label:'Australia → Bangladesh', go: () => this.setState({dir:'ausbd'}), style: this.pill(s.dir === 'ausbd')}
+      ],
+      serviceTabs: ['standard','express','drop-off at Australia Post'].map(x => ({
+        label: x.charAt(0).toUpperCase() + x.slice(1),
+        go: () => this.setB('service', x),
+        style: this.pill(b.service === x, '#12457f')
+      })),
+      v_agree: b.agree,
+      on_agree: e => this.setB('agree', e.target.checked),
+      reviewLines: reviewLines,
+
+      journey: [
+        {n:'01', t:'Booked', d:'Confirmation, reference number and itemised quote issued.'},
+        {n:'02', t:'Picked up', d:'Driver collects from the door in your chosen slot.'},
+        {n:'03', t:'In warehouse', d:'Weighed, scanned, labelled and consolidated for the flight.'},
+        {n:'04', t:'In transit', d:'On the aircraft, with the air waybill number on record.'},
+        {n:'05', t:'Customs', d:'Declarations filed and duty cleared on your behalf.'},
+        {n:'06', t:'Delivered', d:'Photo proof of delivery with time and place.'}
+      ],
+
+      dropRules: [
+        'No postage fee at the outlet if the parcel is 15 kg or more — extra $15 applies per box under 15 kg.',
+        'SMS 0411 123 393 with your name, Australian address, mobile, email, number of boxes and approximate weight.',
+        'We email a label for each box — print it, stick it on, and drop it at any Australia Post outlet.',
+        'Each box must be under 20 kg and no longer than 1 metre.'
+      ],
+      labelFields: [
+        {k:'Name', v:'as on your ID'}, {k:'Australian address', v:'street, suburb, state, postcode'},
+        {k:'Mobile no.', v:'for SMS status updates'}, {k:'Email ID', v:'where labels are sent'},
+        {k:'No. of boxes', v:'one label per box'}, {k:'Approx. weight', v:'per box, in kg'}
+      ],
+
+      terms: [
+        {text:'$35 airport fee per shipment.'},
+        {text:'No perfumes or flammable items allowed. The customer is responsible and will be charged for any undeclared items in the box.'},
+        {text:'Up to $50 money back for lost, stolen or damaged products.'},
+        {text:'Australia-wide drop-off facility at any Australia Post outlet.'},
+        {text:'We clear customs and deliver free home delivery to your destination point.'},
+        {text:'10 to 18 working days delivery time from flight date.'},
+        {text:'BD-Ex Cargo reserves the right to check boxes. Luxury items may be taxed in BD customs — please advise in the packing list; an invoice may be required.'},
+        {text:'Parcel status is notified to the sender by SMS.'},
+        {text:'A full refund for lost and damaged products is processed if the client purchases Product Cover Insurance.'},
+        {text:'Non-garments items from Bangladesh attract an additional handling charge.'}
+      ].map((t, i) => Object.assign({}, t, {
+        fa: i === 4 || i === 5 ? 'fa-solid fa-circle-exclamation' : 'fa-solid fa-circle-check',
+        badge: 'margin-top:2px;font-size:15px;color:' + (i === 4 || i === 5 ? '#c8102e' : '#00694b')
+      })),
+
+      why: [
+        {fa:'fa-solid fa-shield-halved', t:'Dependability', d:'On-time delivery, carefully chosen carriers'},
+        {fa:'fa-solid fa-sliders', t:'Flexibility', d:'Door-to-door or specialised, built around you'},
+        {fa:'fa-solid fa-map-location-dot', t:'Live tracking', d:'GPS on a map, not a guess'},
+        {fa:'fa-solid fa-coins', t:'Two currencies', d:'AUD & BDT, live conversion'},
+        {fa:'fa-solid fa-tag', t:'Transparent pricing', d:'Exact cost before you book'},
+        {fa:'fa-solid fa-file-invoice', t:'Automated paperwork', d:'Quotes, invoices, labels, customs'},
+        {fa:'fa-solid fa-bell', t:'Four alert channels', d:'Email, SMS, WhatsApp, app'},
+        {fa:'fa-regular fa-clock', t:'Open 24/7', d:'No calls, no office hours'}
+      ],
+      quotes: QUOTES.map((x, i) => Object.assign({}, x, {
+        avatar: 'width:44px;height:44px;border-radius:50%;flex:0 0 auto;display:block;background-image:url(' + x.img + ');background-size:cover;background-position:center',
+        wrap: 'background:#f6faf7;border:1px solid #e2ece6;border-radius:22px;padding:30px;display:' + (i === s.quote ? 'block' : 'none') + ';animation:bdxIn .6s ease both'
+      })),
+      quoteDots: QUOTES.map((x, i) => ({
+        go: () => this.setState({quote: i}),
+        style: 'width:' + (i === s.quote ? '32px' : '10px') + ';height:5px;border-radius:999px;border:none;cursor:pointer;transition:all .3s ease;background:' + (i === s.quote ? '#c8102e' : '#dbe7e1')
+      })),
+
+      faqs: FAQS.map((f, i) => ({
+        q: f.q, a: f.a,
+        toggle: () => this.setState(x => ({faq: x.faq === i ? -1 : i})),
+        icon: 'font-size:22px;font-weight:400;color:#00694b;transition:transform .25s ease;transform:rotate(' + (s.faq === i ? '45deg' : '0deg') + ')',
+        body: 'overflow:hidden;transition:max-height .32s ease,opacity .25s ease;max-height:' + (s.faq === i ? '340px' : '0') + ';opacity:' + (s.faq === i ? 1 : 0)
+      })),
+
+      v_track: s.track,
+      on_track: e => this.setState({track: e.target.value}),
+      doTrack: () => this.doTrack(),
+      trackFound: !!(s.trackRes && s.trackRes !== 'empty'),
+      trackEmpty: s.trackRes === 'empty',
+      trackRef: s.trackRes && s.trackRes !== 'empty' ? s.trackRes.ref : '',
+      trackStatus: 'In transit',
+      trackSteps: trackStepNames.map((t, i) => ({
+        label: t[0], time: t[1],
+        dot: 'width:11px;height:11px;border-radius:50%;flex:0 0 auto;background:' + (i <= at ? '#00694b' : '#dbe7e1'),
+        line: 'width:2px;height:' + (i === trackStepNames.length - 1 ? '0' : '26px') + ';background:' + (i < at ? '#00694b' : '#e6efea') + ';display:block',
+        labelStyle: 'font-size:14px;font-weight:' + (i <= at ? 700 : 500) + ';color:' + (i <= at ? '#101f1a' : '#8a9a93')
+      })),
+
+      footerGrid: 'max-width:1240px;margin:0 auto;padding:' + (mob ? '44px 20px 24px' : '64px 20px 28px') +
+        ';display:grid;gap:' + (mob ? '26px 22px' : '36px') + ';grid-template-columns:' +
+        (mob ? 'repeat(2,minmax(0,1fr))' : 'minmax(0,1.3fr) repeat(3,minmax(0,1fr))'),
+      footerBrand: 'min-width:0' + (mob ? ';grid-column:1 / -1' : ''),
+      footerCols: [
+        {title:'SERVICES', items:[{href:'#services',label:'Bangladesh → Australia'},{href:'#rates',label:'Australia → Bangladesh'},{href:'#dropoff',label:'Australia Post drop-off'},{href:'#rates',label:'Sending a TV'}]},
+        {title:'CUSTOMERS', items:[{href:'#booking',label:'Book a pickup'},{href:'#calculator',label:'Price calculator'},{href:'#top',label:'Track a parcel'},{href:'#faq',label:'FAQ'}]},
+        {title:'COMPANY', items:[{href:'#about',label:'About us'},{href:'#terms',label:'Shipping terms'},{href:'#how',label:'How it works'},{href:'tel:0411123393',label:'0411 123 393'},{href:'tel:0406524252',label:'0406 524 252'}]}
+      ]
+    });
+  }
+}
+</script>
+</body>
+</html>

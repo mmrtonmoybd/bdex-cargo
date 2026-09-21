@@ -1,0 +1,80 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+/*
+ * Brand tokens.
+ *
+ * These are fallbacks only. On every request the ThemeVars component writes the
+ * values stored in site_settings into :root, so an admin colour change is live on
+ * the next page load without a rebuild. Nothing in a template should hardcode a
+ * brand colour — reference the token.
+ */
+:root {
+    --void: #04150f;
+    --deep: #072319;
+    --deep2: #0a2f22;
+    --em: #00694b;
+    --sig: #25e39a;
+    --soft: #8fe8c4;
+    --red: #c8102e;
+    --red-hi: #ff4d68;
+    --blue: #12457f;
+    --blue-hi: #5b9be0;
+    --bg: #f5f8f6;
+    --card: #ffffff;
+    --ink: #08160f;
+    --muted: #5e6f67;
+    --line: #e2eae5;
+    --line-soft: #eef3f0;
+    --shell: 1320px;
+    --disp: 'Bricolage Grotesque', 'Arial Black', ui-sans-serif, system-ui, sans-serif;
+    --body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@theme inline {
+    --color-void: var(--void);
+    --color-deep: var(--deep);
+    --color-deep-2: var(--deep2);
+    --color-emerald-brand: var(--em);
+    --color-signal: var(--sig);
+    --color-soft: var(--soft);
+    --color-brand-red: var(--red);
+    --color-brand-red-hi: var(--red-hi);
+    --color-brand-blue: var(--blue);
+    --color-brand-blue-hi: var(--blue-hi);
+    --color-page: var(--bg);
+    --color-card: var(--card);
+    --color-ink: var(--ink);
+    --color-muted: var(--muted);
+    --color-line: var(--line);
+    --color-line-soft: var(--line-soft);
+
+    --font-display: var(--disp);
+    --font-sans: var(--body);
+    --font-mono: var(--mono);
+}
+
+@layer base {
+    body {
+        background-color: var(--bg);
+        color: var(--ink);
+        font-family: var(--body);
+    }
+
+    h1,
+    h2,
+    h3 {
+        font-family: var(--disp);
+        letter-spacing: -0.02em;
+    }
+}
+
+@utility shell {
+    margin-inline: auto;
+    width: 100%;
+    max-width: var(--shell);
+    padding-inline: 1.25rem;
+}
