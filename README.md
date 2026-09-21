@@ -1,58 +1,141 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# BD-EX Cargo
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Air freight and courier platform for parcels moving between **Australia and Bangladesh** —
+a Filament admin back office, a public booking and quoting site, a customer and
+reseller portal, and a carrier abstraction that keeps third-party carriers
+invisible to customers.
 
-## About Laravel
+**Author:** Moshiur Rahman · [rmedha037@gmail.com](mailto:rmedha037@gmail.com)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## What it does
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Area | Covered |
+|---|---|
+| **Booking** | Multi-step wizard, instant itemised quote, doorstep pickup slots, drafts saved in the browser, live prohibited-item checks, address coverage checks |
+| **Pricing** | Per-category and per-weight rate cards, conditional surcharges, 10% GST / 15% VAT per corridor, volume tiers, customer contract rates, dual-currency display |
+| **Tracking** | Six published milestones, BD-EX tracking numbers, public tracking, carrier polling every 12 hours, four notification channels |
+| **Documents** | Invoices, barcoded labels, batch label printing, customs declarations, BD-EX air waybills, searchable invoice history |
+| **Coverage** | Service areas per country, city and postcode, with express and standard transit times |
+| **Reselling** | Seller accounts, own listings at own margin, ratings and reviews, seller performance |
+| **Payments** | Stripe (AU), SSLCommerz and bKash (BD), or staff confirmation — swappable at runtime |
+| **Languages** | English and Bengali, across the site, both panels and every notification |
 
-## Learning Laravel
+## Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Laravel 13 · PHP 8.3+ · Filament 5 · Livewire 4 · Filament Shield · MySQL/MariaDB ·
+Tailwind 4 + Vite · dompdf · Pest 4 · Pint
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Getting started
 
 ```bash
-composer require laravel/boost --dev
+composer install
+cp .env.example .env && php artisan key:generate
 
-php artisan boost:install
+# create a database, set DB_* in .env, then:
+php artisan migrate --seed          # schema, rate card, demo data
+npm install && npm run build
+
+php artisan shield:super-admin --user=1
+composer dev                        # serve + queue listener + vite
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+- Public site — `/`
+- Admin panel — `/admin`
+- Customer & seller portal — `/portal`
 
-## Contributing
+One cron entry drives the scheduled work:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```
+* * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1
+```
 
-## Code of Conduct
+## The three rules this codebase is built around
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 1. Customers never learn which carrier we used
 
-## Security Vulnerabilities
+BD-EX books with Aramex, FedEx, DHL and UPS, and routinely consolidates several
+customers' orders onto **one** carrier booking. The customer only ever sees a
+BD-EX tracking number and BD-EX wording.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- An order gets its BD-EX number on creation, before any carrier exists.
+- `CarrierConsignment` holds the carrier's own number, shared by every order on it.
+- When a carrier reports movement, `StatusFanOutService` writes one history row
+  **per order** — same status, same timestamp — so five customers see the
+  identical milestone at the identical moment, and none is told why.
+- `CustomerFacingOrder` is the only class allowed to build a customer-facing
+  payload. It selects by column whitelist and never loads the carrier relation.
 
-## License
+Twelve tests plant `FedEx`, its tracking number and its API credential in the
+database, then assert none of it can be made to appear in the tracking endpoint,
+the homepage, the portal, or the generated invoice and label PDFs — which are
+parsed back to text and checked.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 2. Nothing operational is hardcoded
+
+Every price, fee, tax rate, credential, driver selection, role and piece of copy
+is a database row, editable from the panel. Only Laravel's bootstrap config
+(`APP_KEY`, `APP_ENV`, `APP_URL`, `APP_DEBUG`, `DB_*`, `CACHE_STORE`,
+`QUEUE_CONNECTION`, `SESSION_DRIVER`) stays in `.env`.
+
+- Credentials go through `App\Services\Config\DynamicConfig`, encrypted at rest.
+- Prices go through `App\Services\Pricing\PricingEngine`, which holds no rates.
+- Carriers, SMS, WhatsApp and payment gateways sit behind driver interfaces
+  selected at runtime.
+
+Three tests enforce this rather than a code review: no `env()` in `app/`, no
+`config('services.*')` in `app/`, and no money literal anywhere in
+`app/Services/Pricing`.
+
+**The honest limit:** a provider nobody has written a driver class for still needs
+one class implementing the relevant interface. A wire protocol cannot be invented
+from admin clicks. Every operational change after that first class — rotating
+keys, switching provider, adding a second account — is data entry.
+
+### 3. The engine refuses rather than guesses
+
+Quoting a category into a zone with no rate, or a weight no tier covers, throws
+with a message naming the screen that fixes it. Figures the published rate card
+never stated are seeded flagged and surfaced on the dashboard until someone
+confirms them.
+
+## Layout
+
+```
+app/
+  Actions/            CreateOrderFromBooking
+  Filament/           Resources, Pages, Widgets (admin) · Portal/ (customer & seller)
+  Services/
+    Carrier/          adapters, factory, normalised statuses
+    Compliance/       prohibited items, service areas
+    Config/           DynamicConfig
+    Documents/        invoices, labels, customs, barcodes
+    Notifications/    SMS and WhatsApp drivers
+    Payments/         gateway drivers and processor
+    Pricing/          PricingEngine and its DTOs
+    Reporting/        metrics and report builder
+    Tracking/         number generator, fan-out, CustomerFacingOrder
+docs/
+  reference/prototype/    the approved design this site is ported from
+  superpowers/specs/      design decisions, per phase
+```
+
+## Commands
+
+```bash
+composer test     # Pest
+composer lint     # Pint --test + prettier --check
+composer fix      # Pint + prettier --write
+```
+
+## Design
+
+The public site is a 1:1 port of the approved prototype in
+`docs/reference/prototype/` — its CSS, its markup and all fourteen keyframes.
+Colours, fonts and every word are driven from the database, so the look changes
+from the panel rather than from the stylesheet.
+
+## Licence
+
+Proprietary. © BD-EX Cargo.
