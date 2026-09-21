@@ -19,7 +19,11 @@ final class SiteSettingSeeder extends Seeder
     {
         SiteSetting::query()->firstOrCreate([], [
             'business_name' => 'BD-EX Cargo',
-            'tagline' => 'Australia ⇄ Bangladesh parcel and cargo, tracked end to end.',
+            'tagline' => 'BD-EX Cargo ships parcels between Bangladesh and Australia in 6–9 business days. Free pickup anywhere in Bangladesh, free packaging, live tracking, home delivery Australia wide.',
+            'contact_phone_au' => '0411 123 393',
+            'contact_phone_bd' => '0406 524 252',
+            'contact_whatsapp' => '0411 123 393',
+            'contact_email' => 'hello@bdexcargo.com.au',
             'color_void' => '#04150f',
             'color_signal' => '#25e39a',
             'color_red' => '#c8102e',

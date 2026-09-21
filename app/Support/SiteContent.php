@@ -60,4 +60,36 @@ final class SiteContent
     {
         return $this->section($key)?->body ?? $default;
     }
+
+    /**
+     * A heading with the design's line break restored.
+     *
+     * Editors type `|` where the layout breaks the line, and a heading may carry a
+     * little emphasis markup. Everything else is stripped before it reaches the
+     * page, so a content edit can never inject markup of its own.
+     */
+    public function heading(string $key, string $default = ''): string
+    {
+        $title = $this->section($key)?->title ?? $default;
+
+        return str_replace('|', '<br>', strip_tags($title, '<em><strong><br>'));
+    }
+
+    /**
+     * One value out of a section's list payload.
+     */
+    public function data(string $key, string $field, mixed $default = null): mixed
+    {
+        return $this->section($key)?->data[$field] ?? $default;
+    }
+
+    /**
+     * A section's whole list payload.
+     *
+     * @return array<string, mixed>
+     */
+    public function payload(string $key): array
+    {
+        return $this->section($key)?->data ?? [];
+    }
 }

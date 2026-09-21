@@ -90,11 +90,19 @@ final class SurchargeEvaluator
     {
         $amount = (float) $rule->amount;
 
-        return match ($rule->calculation_type) {
+        $calculated = match ($rule->calculation_type) {
             CalculationType::Flat => $amount,
             CalculationType::Percentage => $subtotal * ($amount / 100),
             CalculationType::PerKg => $amount * $weightKg,
             CalculationType::PerItem => $amount * $itemCount,
         };
+
+        // A floor lets "per kg, but never less than X" stay a row rather than
+        // becoming the one fee that needs an `if` in PHP.
+        if ($rule->minimum_amount !== null && $calculated > 0.0) {
+            $calculated = max($calculated, (float) $rule->minimum_amount);
+        }
+
+        return $calculated;
     }
 }

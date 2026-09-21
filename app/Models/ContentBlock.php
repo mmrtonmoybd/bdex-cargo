@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $title
  * @property string|null $body
  * @property string|null $icon
+ * @property array<int|string, mixed>|null $data
  * @property int $sort_order
  * @property bool $is_active
  */
@@ -32,6 +33,7 @@ final class ContentBlock extends Model
         'title',
         'body',
         'icon',
+        'data',
         'sort_order',
         'is_active',
     ];
@@ -40,6 +42,7 @@ final class ContentBlock extends Model
     protected function casts(): array
     {
         return [
+            'data' => 'array',
             'sort_order' => 'integer',
             'is_active' => 'boolean',
         ];

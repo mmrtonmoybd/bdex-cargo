@@ -162,20 +162,43 @@ final class PricingSeeder extends Seeder
 
     private function weightTiers(ShippingRoute $route): void
     {
+        // The published BD → AU tier sheet, in full. Every band is a row an admin
+        // can reprice, split or retire.
         $tiers = [
-            ['min' => 1, 'max' => 10, 'price' => 44, 'sort' => 1],
-            ['min' => 10.1, 'max' => 15, 'price' => 21, 'sort' => 2],
+            ['min' => 0.1, 'max' => 1, 'price' => 44],
+            ['min' => 1.1, 'max' => 2, 'price' => 33],
+            ['min' => 2.1, 'max' => 3, 'price' => 29],
+            ['min' => 3.1, 'max' => 4, 'price' => 27],
+            ['min' => 4.1, 'max' => 5, 'price' => 26],
+            ['min' => 5.1, 'max' => 6, 'price' => 25],
+            ['min' => 6.1, 'max' => 7, 'price' => 24],
+            ['min' => 7.1, 'max' => 8, 'price' => 23.5],
+            ['min' => 8.1, 'max' => 9, 'price' => 22.8],
+            ['min' => 9.1, 'max' => 10, 'price' => 22.5],
+            ['min' => 10.1, 'max' => 15, 'price' => 21],
+            ['min' => 15.1, 'max' => 20, 'price' => 20],
+            ['min' => 20.1, 'max' => 30, 'price' => 19],
+            ['min' => 30.1, 'max' => 50, 'price' => 18],
+            ['min' => 50.1, 'max' => 70, 'price' => 17],
+            ['min' => 70.1, 'max' => null, 'price' => 15],
         ];
 
-        foreach ($tiers as $tier) {
+        // The published sheet is the whole sheet: drop any band it no longer lists so
+        // a reseed cannot leave a stale row quietly underpricing a shipment.
+        WeightTier::query()
+            ->where('shipping_route_id', $route->id)
+            ->whereNotIn('min_kg', array_column($tiers, 'min'))
+            ->delete();
+
+        foreach ($tiers as $index => $tier) {
             WeightTier::query()->updateOrCreate(
                 ['shipping_route_id' => $route->id, 'min_kg' => $tier['min']],
                 [
                     'max_kg' => $tier['max'],
                     'price_per_kg' => $tier['price'],
-                    'applies_to' => WeightTierScope::GarmentOnly,
-                    'note' => 'Garment items only.',
-                    'sort_order' => $tier['sort'],
+                    'applies_to' => WeightTierScope::All,
+                    'note' => '*For garment items only',
+                    'sort_order' => $index + 1,
                     'is_active' => true,
                 ],
             );
@@ -290,16 +313,17 @@ final class PricingSeeder extends Seeder
             ],
             [
                 'code' => 'bd_au_non_garment_handling',
-                'label' => 'Non-garment handling',
-                'description' => 'Amount was never published — set it before taking non-garment bookings on this route.',
+                'label' => 'Non-garments handling charge',
+                'description' => 'Charged per kg with a floor, as published on the rate sheet.',
                 'shipping_route_id' => $bdToAu->id,
                 'item_category_id' => null,
-                'calculation_type' => CalculationType::Flat,
-                'amount' => 0,
+                'calculation_type' => CalculationType::PerKg,
+                'amount' => 2,
+                'minimum_amount' => 20,
                 'condition_field' => ConditionField::IsNonGarment,
                 'condition_operator' => ConditionOperator::IsTrue,
                 'condition_value' => null,
-                'is_placeholder_amount' => true,
+                'is_placeholder_amount' => false,
                 'sort_order' => 5,
             ],
         ];

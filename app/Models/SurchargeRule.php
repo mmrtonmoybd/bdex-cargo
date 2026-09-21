@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $item_category_id
  * @property CalculationType $calculation_type
  * @property string $amount
+ * @property string|null $minimum_amount
  * @property ConditionField|null $condition_field
  * @property ConditionOperator|null $condition_operator
  * @property string|null $condition_value
@@ -39,6 +40,7 @@ final class SurchargeRule extends Model
         'item_category_id',
         'calculation_type',
         'amount',
+        'minimum_amount',
         'condition_field',
         'condition_operator',
         'condition_value',
