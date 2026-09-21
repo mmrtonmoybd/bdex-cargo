@@ -108,6 +108,12 @@ final class Order extends Model
         return $this->hasMany(OrderStatusHistory::class)->orderBy('occurred_at');
     }
 
+    /** @return HasMany<Payment, $this> */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class)->latest();
+    }
+
     /** @return HasOne<Invoice, $this> */
     public function invoice(): HasOne
     {

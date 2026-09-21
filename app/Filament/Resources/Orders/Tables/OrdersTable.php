@@ -12,6 +12,7 @@ use App\Models\Order;
 use App\Services\Documents\CustomsDeclarationGenerator;
 use App\Services\Documents\InvoiceGenerator;
 use App\Services\Documents\LabelGenerator;
+use App\Services\Payments\PaymentProcessor;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -19,6 +20,7 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -121,6 +123,37 @@ class OrdersTable
                         );
 
                         Notification::make()->title('Status recorded')->success()->send();
+                    }),
+                Action::make('recordPayment')
+                    ->label('Record payment')
+                    ->icon('heroicon-o-banknotes')
+                    ->visible(fn (Order $record): bool => $record->payment_status !== PaymentStatus::Paid)
+                    ->schema([
+                        TextInput::make('amount')
+                            ->label('Amount received')
+                            ->numeric()
+                            ->prefix('$')
+                            ->minValue(0.01)
+                            ->default(fn (Order $record): float => max(0, (float) $record->total_cost_aud - (float) $record->paid_amount))
+                            ->required(),
+                        TextInput::make('reference')
+                            ->label('Reference')
+                            ->helperText('Bank transfer reference, receipt number, or however it arrived.'),
+                    ])
+                    ->modalDescription('For money that arrived outside a gateway — a bank transfer, or cash at the counter. The order settles from what actually cleared.')
+                    ->action(function (Order $record, array $data): void {
+                        app(PaymentProcessor::class)->recordManualPayment(
+                            order: $record,
+                            amount: (float) $data['amount'],
+                            userId: auth()->id(),
+                            reference: $data['reference'] ?? null,
+                        );
+
+                        Notification::make()
+                            ->title('Payment recorded')
+                            ->body('The order now reads '.$record->fresh()->payment_status->getLabel().'.')
+                            ->success()
+                            ->send();
                     }),
                 Action::make('paperwork')
                     ->label('Paperwork')

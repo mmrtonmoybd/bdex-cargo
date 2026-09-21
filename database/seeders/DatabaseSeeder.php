@@ -13,6 +13,7 @@ final class DatabaseSeeder extends Seeder
         $this->call([
             ConfigEntrySeeder::class,
             NotificationConfigSeeder::class,
+            PaymentConfigSeeder::class,
             SiteSettingSeeder::class,
             ContentBlockSeeder::class,
             ServiceAreaSeeder::class,
