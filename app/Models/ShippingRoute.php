@@ -33,6 +33,8 @@ final class ShippingRoute extends Model
         'base_currency',
         'quote_currency',
         'transit_time_text',
+        'tax_rate_percent',
+        'tax_label',
         'sort_order',
         'is_active',
     ];

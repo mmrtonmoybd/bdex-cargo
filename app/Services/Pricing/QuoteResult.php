@@ -19,6 +19,7 @@ final readonly class QuoteResult
         public string $baseCurrency,
         public string $quoteCurrency,
         public float $taxRatePercent = 0.0,
+        public ?string $taxLabel = null,
         public ?float $fxRateUsed = null,
         public ?string $fxFetchedAt = null,
     ) {}
@@ -51,6 +52,7 @@ final readonly class QuoteResult
             'line_items' => $this->lineItems->map(fn (QuoteLineItem $item): array => $item->toArray())->all(),
             'subtotal' => $this->subtotal(),
             'tax_rate_percent' => $this->taxRatePercent,
+            'tax_label' => $this->taxLabel,
             'tax' => $this->tax(),
             'total' => $this->total(),
             'base_currency' => $this->baseCurrency,

@@ -7,9 +7,11 @@ use App\Enums\ConditionField;
 use App\Enums\ConditionOperator;
 use App\Enums\PricingModel;
 use App\Enums\WeightTierScope;
+use App\Models\Customer;
 use App\Models\FxRate;
 use App\Models\ItemCategory;
 use App\Models\ItemCategoryZoneRate;
+use App\Models\PricingAgreement;
 use App\Models\PricingZone;
 use App\Models\ShippingRoute;
 use App\Models\SurchargeRule;
@@ -479,5 +481,140 @@ describe('quote traceability', function (): void {
             ->and($breakdown['line_items'][0]['source_type'])->toBe('item_category')
             ->and($breakdown['line_items'][1]['source_code'])->toBe('airport')
             ->and($breakdown['total'])->toBe(205.0);
+    });
+});
+
+describe('corridor tax', function (): void {
+    it('charges the route its own tax rate and names it', function (): void {
+        $route = makeRoute();
+        $route->update(['tax_rate_percent' => 10, 'tax_label' => 'GST']);
+
+        $zone = makeZone($route);
+        $category = makeCategory($route, PricingModel::PerKgByZone);
+        makeRate($category, $zone, 10);
+
+        $quote = app(PricingEngine::class)->quoteAuToBd(
+            collect([new QuoteItem($category, weightKg: 10)]),
+            $zone,
+        );
+
+        expect($quote->subtotal())->toBe(100.0)
+            ->and($quote->taxLabel)->toBe('GST')
+            ->and($quote->tax())->toBe(10.0)
+            ->and($quote->total())->toBe(110.0);
+    });
+
+    it('lets two corridors carry different tax', function (): void {
+        $au = makeRoute('AU_TO_BD');
+        $au->update(['tax_rate_percent' => 10, 'tax_label' => 'GST']);
+
+        $bd = makeRoute('BD_TO_AU');
+        $bd->update(['tax_rate_percent' => 15, 'tax_label' => 'VAT']);
+
+        $zone = makeZone($au);
+        $category = makeCategory($au, PricingModel::PerKgByZone);
+        makeRate($category, $zone, 10);
+
+        WeightTier::query()->create([
+            'shipping_route_id' => $bd->id,
+            'min_kg' => 1,
+            'max_kg' => 20,
+            'price_per_kg' => 10,
+            'applies_to' => WeightTierScope::All,
+            'is_active' => true,
+        ]);
+
+        $engine = app(PricingEngine::class);
+
+        expect($engine->quoteAuToBd(collect([new QuoteItem($category, weightKg: 10)]), $zone)->total())->toBe(110.0)
+            ->and($engine->quoteBdToAu(10, true, $bd)->total())->toBe(115.0);
+    });
+});
+
+describe('volume and contract rates', function (): void {
+    beforeEach(function (): void {
+        $this->route = makeRoute('BD_TO_AU');
+
+        WeightTier::query()->create([
+            'shipping_route_id' => $this->route->id,
+            'min_kg' => 1,
+            'max_kg' => 500,
+            'price_per_kg' => 10,
+            'applies_to' => WeightTierScope::All,
+            'is_active' => true,
+        ]);
+    });
+
+    it('applies a published volume tier once the shipment is big enough', function (): void {
+        PricingAgreement::query()->create([
+            'label' => 'Volume rate — 25kg and over',
+            'shipping_route_id' => $this->route->id,
+            'min_weight_kg' => 25,
+            'discount_percent' => 10,
+            'is_active' => true,
+        ]);
+
+        $engine = app(PricingEngine::class);
+
+        // 20kg misses the threshold; 30kg earns 10% off.
+        expect($engine->quoteBdToAu(20, true, $this->route)->total())->toBe(200.0)
+            ->and($engine->quoteBdToAu(30, true, $this->route)->total())->toBe(270.0);
+    });
+
+    it('prefers a customer contract over a published tier', function (): void {
+        $customer = Customer::factory()->create();
+
+        PricingAgreement::query()->create([
+            'label' => 'Volume rate',
+            'shipping_route_id' => $this->route->id,
+            'min_weight_kg' => 10,
+            'discount_percent' => 10,
+            'priority' => 5,
+            'is_active' => true,
+        ]);
+
+        PricingAgreement::query()->create([
+            'label' => 'Acme contract rate',
+            'customer_id' => $customer->id,
+            'shipping_route_id' => $this->route->id,
+            'discount_percent' => 6,
+            'is_active' => true,
+        ]);
+
+        $quote = app(PricingEngine::class)->quoteBdToAu(30, true, $this->route, customer: $customer);
+
+        // The negotiated rate wins even though the public tier discounts more —
+        // a contract is a commitment, not a promotion to be beaten.
+        expect($quote->lineItems->last()->label)->toBe('Acme contract rate')
+            ->and($quote->total())->toBe(282.0);
+    });
+
+    it('ignores an expired agreement', function (): void {
+        PricingAgreement::query()->create([
+            'label' => 'Last winter promotion',
+            'shipping_route_id' => $this->route->id,
+            'min_weight_kg' => 1,
+            'discount_percent' => 50,
+            'valid_until' => now()->subDay()->toDateString(),
+            'is_active' => true,
+        ]);
+
+        expect(app(PricingEngine::class)->quoteBdToAu(30, true, $this->route)->total())->toBe(300.0);
+    });
+
+    it('shows the discount as its own line, so the customer can see it', function (): void {
+        PricingAgreement::query()->create([
+            'label' => 'Volume rate — 25kg and over',
+            'shipping_route_id' => $this->route->id,
+            'min_weight_kg' => 25,
+            'discount_percent' => 10,
+            'is_active' => true,
+        ]);
+
+        $breakdown = app(PricingEngine::class)->quoteBdToAu(30, true, $this->route)->toArray();
+        $discount = collect($breakdown['line_items'])->firstWhere('source_type', 'pricing_agreement');
+
+        expect($discount['amount'])->toBe(-30.0)
+            ->and($discount['detail'])->toBe('10% off');
     });
 });

@@ -6,6 +6,8 @@ namespace App\Services\Pricing;
 
 use App\Enums\PricingModel;
 use App\Enums\WeightTierScope;
+use App\Models\Customer;
+use App\Models\PricingAgreement;
 use App\Models\PricingZone;
 use App\Models\ShippingRoute;
 use App\Models\SurchargeRule;
@@ -42,6 +44,7 @@ final class PricingEngine
         PricingZone $zone,
         int $boxCount = 1,
         float $lightestBoxWeightKg = 0.0,
+        ?Customer $customer = null,
     ): QuoteResult {
         $route = $zone->shippingRoute()->firstOrFail();
 
@@ -51,7 +54,7 @@ final class PricingEngine
 
         $context = $this->contextFor($items, $boxCount, $lightestBoxWeightKg);
 
-        return $this->applySurcharges($lineItems, $items, $context, $route);
+        return $this->applySurcharges($lineItems, $items, $context, $route, customer: $customer);
     }
 
     /**
@@ -62,6 +65,7 @@ final class PricingEngine
         bool $isGarment,
         ShippingRoute $route,
         int $boxCount = 1,
+        ?Customer $customer = null,
     ): QuoteResult {
         $tier = $this->weightTierFor($route, $totalWeightKg, $isGarment);
 
@@ -88,7 +92,7 @@ final class PricingEngine
             itemCount: $boxCount,
         );
 
-        return $this->applySurcharges($lineItems, collect(), $context, $route, $totalWeightKg);
+        return $this->applySurcharges($lineItems, collect(), $context, $route, $totalWeightKg, $customer);
     }
 
     /** The active tier covering a weight, honouring garment-only scoping. */
@@ -188,6 +192,7 @@ final class PricingEngine
         QuoteContext $context,
         ShippingRoute $route,
         ?float $weightOverrideKg = null,
+        ?Customer $customer = null,
     ): QuoteResult {
         $weightKg = $weightOverrideKg ?? $context->totalWeightKg;
         $subtotal = (float) $lineItems->sum(fn (QuoteLineItem $line): float => $line->amount);
@@ -215,15 +220,77 @@ final class PricingEngine
             }
         }
 
+        // Volume tiers and contract rates discount the engine's own price, so an
+        // upstream rate change still reaches every agreement.
+        $discount = $this->agreementDiscount(
+            $route,
+            $customer,
+            $weightKg,
+            (float) $lineItems->sum(fn (QuoteLineItem $line): float => $line->amount),
+        );
+
+        if ($discount !== null) {
+            $lineItems->push($discount);
+        }
+
         $fxRate = $this->fx->latest($route->base_currency, $route->quote_currency);
 
         return new QuoteResult(
             lineItems: $lineItems->values(),
             baseCurrency: $route->base_currency,
             quoteCurrency: $route->quote_currency,
-            taxRatePercent: DynamicConfig::float('pricing.tax_rate_percent'),
+            // The corridor's own rate; the config value remains the fallback for a
+            // route nobody has set one on yet.
+            taxRatePercent: (float) $route->tax_rate_percent > 0
+                ? (float) $route->tax_rate_percent
+                : DynamicConfig::float('pricing.tax_rate_percent'),
+            taxLabel: $route->tax_label ?? 'Tax',
             fxRateUsed: $fxRate === null ? null : (float) $fxRate->rate,
             fxFetchedAt: $fxRate?->fetched_at->toIso8601String(),
+        );
+    }
+
+    /**
+     * The best agreement this shipment qualifies for, as a discount line.
+     *
+     * A customer's own contract wins over a published volume tier, and among
+     * equals the higher priority wins — so a negotiated rate is never silently
+     * beaten by a promotion.
+     */
+    private function agreementDiscount(
+        ShippingRoute $route,
+        ?Customer $customer,
+        float $weightKg,
+        float $subtotal,
+    ): ?QuoteLineItem {
+        if ($subtotal <= 0.0) {
+            return null;
+        }
+
+        $shipmentsThisMonth = $customer === null
+            ? 0
+            : $customer->orders()->where('created_at', '>=', now()->startOfMonth())->count();
+
+        $agreement = PricingAgreement::query()
+            ->active()
+            ->availableTo($customer?->id, $route->id)
+            ->orderByDesc('priority')
+            ->orderByDesc('discount_percent')
+            ->get()
+            ->filter(fn (PricingAgreement $a): bool => $a->qualifies($weightKg, $shipmentsThisMonth))
+            ->sortByDesc(fn (PricingAgreement $a): array => [$a->isContract() ? 1 : 0, $a->priority, (float) $a->discount_percent])
+            ->first();
+
+        if ($agreement === null || (float) $agreement->discount_percent <= 0.0) {
+            return null;
+        }
+
+        return new QuoteLineItem(
+            label: $agreement->label,
+            amount: -round($subtotal * ((float) $agreement->discount_percent / 100), 2),
+            sourceType: 'pricing_agreement',
+            sourceCode: (string) $agreement->id,
+            detail: rtrim(rtrim(number_format((float) $agreement->discount_percent, 2), '0'), '.').'% off',
         );
     }
 

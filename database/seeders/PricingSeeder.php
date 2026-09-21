@@ -11,6 +11,7 @@ use App\Enums\PricingModel;
 use App\Enums\WeightTierScope;
 use App\Models\ItemCategory;
 use App\Models\ItemCategoryZoneRate;
+use App\Models\PricingAgreement;
 use App\Models\PricingZone;
 use App\Models\ShippingRoute;
 use App\Models\SurchargeRule;
@@ -40,6 +41,9 @@ final class PricingSeeder extends Seeder
             // Staff own this wording per route rather than the code choosing.
             transit: '10 to 18 working days',
             sort: 1,
+            // Leaving Australia, so Australian GST applies.
+            taxPercent: 10,
+            taxLabel: 'GST',
         );
 
         $bdToAu = $this->route(
@@ -53,6 +57,9 @@ final class PricingSeeder extends Seeder
             // business days", a separate document says 6-9 business days.
             transit: '4+ estimated business days',
             sort: 2,
+            // Leaving Bangladesh, so Bangladeshi VAT applies.
+            taxPercent: 15,
+            taxLabel: 'VAT',
         );
 
         $zones = $this->zones($auToBd);
@@ -61,6 +68,39 @@ final class PricingSeeder extends Seeder
         $this->weightTiers($bdToAu);
         $this->tvSizeBands($auToBd);
         $this->surchargeRules($auToBd, $bdToAu);
+        $this->volumeTiers($auToBd, $bdToAu);
+    }
+
+    /**
+     * Published volume tiers: ship more, pay less per package.
+     *
+     * Anyone qualifies by meeting the threshold — no negotiation needed. A
+     * customer's own contract rate is a separate row with their id on it, added
+     * from the panel.
+     */
+    private function volumeTiers(ShippingRoute $auToBd, ShippingRoute $bdToAu): void
+    {
+        $tiers = [
+            ['label' => 'Volume rate — 25kg and over', 'min_weight_kg' => 25, 'discount_percent' => 4, 'priority' => 1],
+            ['label' => 'Volume rate — 50kg and over', 'min_weight_kg' => 50, 'discount_percent' => 7, 'priority' => 2],
+            ['label' => 'Regular shipper — 5+ shipments a month', 'min_shipments_per_month' => 5, 'discount_percent' => 5, 'priority' => 3],
+        ];
+
+        foreach ([$auToBd, $bdToAu] as $route) {
+            foreach ($tiers as $tier) {
+                PricingAgreement::query()->updateOrCreate(
+                    ['label' => $tier['label'], 'shipping_route_id' => $route->id, 'customer_id' => null],
+                    [
+                        'description' => 'Published tier — applied automatically when the shipment qualifies.',
+                        'min_weight_kg' => $tier['min_weight_kg'] ?? null,
+                        'min_shipments_per_month' => $tier['min_shipments_per_month'] ?? null,
+                        'discount_percent' => $tier['discount_percent'],
+                        'priority' => $tier['priority'],
+                        'is_active' => true,
+                    ],
+                );
+            }
+        }
     }
 
     private function route(
@@ -72,6 +112,8 @@ final class PricingSeeder extends Seeder
         string $quote,
         string $transit,
         int $sort,
+        float $taxPercent = 0,
+        ?string $taxLabel = null,
     ): ShippingRoute {
         return ShippingRoute::query()->updateOrCreate(
             ['code' => $code],
@@ -82,6 +124,8 @@ final class PricingSeeder extends Seeder
                 'base_currency' => $base,
                 'quote_currency' => $quote,
                 'transit_time_text' => $transit,
+                'tax_rate_percent' => $taxPercent,
+                'tax_label' => $taxLabel,
                 'sort_order' => $sort,
                 'is_active' => true,
             ],
