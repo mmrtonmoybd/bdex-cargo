@@ -30,6 +30,8 @@ final class SiteSettingSeeder extends Seeder
             'color_blue' => '#12457f',
             'color_bg' => '#f5f8f6',
             'color_ink' => '#08160f',
+            'color_nav_bg' => '#eaeeec',
+            'color_nav_ink' => '#0b1f17',
             'banned_items' => [
                 'perfume',
                 'body spray',

@@ -84,6 +84,8 @@ class ManageSiteSettings extends Page
                                         ColorPicker::make('color_blue')->label('Brand blue')->required(),
                                         ColorPicker::make('color_bg')->label('Page background')->required(),
                                         ColorPicker::make('color_ink')->label('Body text')->required(),
+                                        ColorPicker::make('color_nav_bg')->label('Header background'),
+                                        ColorPicker::make('color_nav_ink')->label('Header text'),
                                     ]),
                                 ]),
                             Section::make('Typefaces')

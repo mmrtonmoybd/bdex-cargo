@@ -59,6 +59,8 @@ final class SiteSettings
             '--blue' => (string) $this->get('color_blue'),
             '--bg' => (string) $this->get('color_bg'),
             '--ink' => (string) $this->get('color_ink'),
+            '--nav-bg' => (string) $this->get('color_nav_bg', '#eaeeec'),
+            '--nav-ink' => (string) $this->get('color_nav_ink', '#0b1f17'),
             '--disp' => (string) $this->get('font_display'),
             '--body' => (string) $this->get('font_body'),
             '--mono' => (string) $this->get('font_mono'),

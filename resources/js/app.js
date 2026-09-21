@@ -409,7 +409,7 @@ function renderBooking(){
       '<div><label class="lbl">Approx. weight (kg)</label><input class="fld" data-w="1" value="'+S.weight+'"></div></div>'+
       '<div><label class="lbl">Contents</label><select class="fld" data-cat="1">'+CATS.map(function(c){ return '<option value="'+c.id+'"'+(S.cat===c.id?' selected':'')+'>'+c.label+'</option>'; }).join('')+'</select></div>'+
       area('notes','Packing list / handling notes','Quantity of each item, size of liquids (ml/g), number of sharee, kamiz, shirts, pants…',3)+
-      '<div class="warn">Prohibited: perfume, body spray, flammables, alcohol, cigarettes, gold, diamonds, currency, AA/AAA batteries, adult toys. Each box max 20 kg and under 1 metre.</div></div>';
+      '<div class="warn" id="packWarn">'+COPY.prohibited+'</div></div>';
   } else {
     var q = lastQuote;
     var rows = [
@@ -452,24 +452,84 @@ el('bookBody').addEventListener('click', function(e){
         sender_name: S.b.senderName, sender_phone: S.b.senderPhone, sender_address: S.b.senderAddr,
         receiver_name: S.b.recName, receiver_phone: S.b.recPhone, receiver_address: S.b.recAddr,
         boxes: S.b.boxes, weight_kg: S.weight, category: S.cat,
-        notes: S.b.notes, agree: S.b.agree, zone: S.st, item_type: S.itemType
+        notes: S.b.notes, agree: S.b.agree, zone: S.st, item_type: S.itemType,
+        email: S.b.email || null
       })
     })
     .then(function(r){ return r.json().then(function(j){ return {ok:r.ok, body:j}; }); })
     .then(function(res){
       b.disabled = false;
       if (!res.ok){ el('bookError').textContent = res.body.message || COPY.bookingFailed; return; }
+      clearDraft();
       S.done = true; S.ref = res.body.reference; renderBooking();
     })
     .catch(function(){ b.disabled = false; el('bookError').textContent = COPY.bookingFailed; });
   }
 });
+/* Drafts are kept in the browser so a half-finished booking survives a closed tab.
+   Nothing sensitive goes in: names and addresses the customer typed themselves,
+   on their own device, cleared the moment the booking is submitted. */
+var DRAFT_KEY = 'bdex.booking.draft';
+function saveDraft(){
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      b: S.b, weight: S.weight, cat: S.cat, dir: S.dir, st: S.st, itemType: S.itemType, step: S.step
+    }));
+  } catch (e) { /* private browsing, or a full quota — the form still works */ }
+}
+function loadDraft(){
+  try {
+    var raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    var d = JSON.parse(raw);
+    if (d.b) S.b = Object.assign(S.b, d.b);
+    if (d.weight) S.weight = d.weight;
+    if (d.cat) S.cat = d.cat;
+    if (d.dir) S.dir = d.dir;
+    if (d.st) S.st = d.st;
+    if (d.itemType) S.itemType = d.itemType;
+    if (d.step) S.step = Math.min(4, Math.max(1, d.step));
+  } catch (e) { /* a corrupt draft is not worth failing the page over */ }
+}
+function clearDraft(){
+  try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+}
+
+/* Checks the packing list against the banned-items list while it is typed, so a
+   prohibited item is caught before the box is packed rather than at customs. */
+var packTimer = 0;
+function checkPackingList(text){
+  var warn = el('packWarn');
+  if (!warn) return;
+  clearTimeout(packTimer);
+  packTimer = setTimeout(function(){
+    fetch(ENDPOINTS.validateItems, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':CSRF},
+      body: JSON.stringify({text: text || ''})
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      warn.textContent = res.flagged ? res.message : COPY.prohibited;
+      warn.style.borderColor = res.flagged ? 'var(--red)' : '';
+      warn.style.color = res.flagged ? 'var(--red)' : '';
+    })
+    .catch(function(){ /* the check is advisory; leave the standing notice up */ });
+  }, 500);
+}
+
 el('bookBody').addEventListener('input', function(e){
   var t = e.target, k = t.getAttribute('data-b');
-  if (k){ S.b[k] = t.value; return; }
+  if (k){
+    S.b[k] = t.value;
+    saveDraft();
+    if (k === 'notes') checkPackingList(t.value);
+    return;
+  }
   if (t.hasAttribute('data-w')){ var v = parseFloat(t.value); S.weight = isNaN(v) ? 0 : v; renderCalcControls(); }
   if (t.hasAttribute('data-cat')){ S.cat = t.value; renderCalcControls(); }
   if (t.hasAttribute('data-agree')){ S.b.agree = t.checked; }
+  saveDraft();
 });
 el('bookBody').addEventListener('change', function(e){
   var t = e.target;
@@ -561,6 +621,7 @@ var cio = new IntersectionObserver(function(entries){
 cio.observe(document.querySelector('.instr'));
 
 /* ================= INIT ================= */
+loadDraft();
 renderCalcControls();
 renderRateTabs();
 renderRatePanel();

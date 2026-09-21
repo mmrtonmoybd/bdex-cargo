@@ -81,16 +81,26 @@ final class PublicSitePayload
                 'trackEmpty' => 'Enter your BD-EX reference to see where the parcel is.',
                 'trackMissing' => 'No parcel found for that number. Check the reference on your booking confirmation.',
                 'bookingFailed' => 'We could not save that booking. Check the details and try again.',
+                'prohibited' => 'Prohibited: '.$this->prohibitedList().'. Each box max 20 kg and under 1 metre.',
             ],
 
             'endpoints' => [
                 'quote' => route('api.quote.preview'),
                 'track' => route('api.track.index').'/',
                 'booking' => route('api.booking.store'),
+                'validateItems' => route('api.items.validate'),
             ],
 
             'csrf' => csrf_token(),
         ];
+    }
+
+    /** The banned-items list as prose, straight from the editable setting. */
+    private function prohibitedList(): string
+    {
+        $items = $this->settings->bannedItems();
+
+        return $items === [] ? 'nothing currently listed' : implode(', ', $items);
     }
 
     /** @return array<int, array{id: string, label: string}> */
