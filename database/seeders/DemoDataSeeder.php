@@ -370,36 +370,50 @@ final class DemoDataSeeder extends Seeder
         }
     }
 
-    /** @param array<int, Order> $orders */
+    /**
+     * Puts orders onto real carrier bookings.
+     *
+     * Grouped by the point each shipment has actually reached, because a
+     * consignment is one physical movement: everything on board is at the same
+     * place at the same time. Attaching a delivered parcel to a consignment still
+     * sitting in customs would produce a system that contradicts itself.
+     *
+     * The groups are deliberately lopsided — one FedEx booking carries five
+     * different customers' orders, which is the case the whole abstraction exists
+     * for.
+     *
+     * @param  array<int, Order>  $orders
+     */
     private function consolidate(array $orders): void
     {
-        $carriers = Carrier::query()->get()->keyBy('code');
+        $carriers = Carrier::query()->get()->values();
 
         if ($carriers->isEmpty()) {
             return;
         }
 
-        // Deliberately lopsided: one consignment carries five unrelated customers'
-        // orders, which is the case the whole abstraction exists for.
-        $groups = [
-            ['fedex', '794658123456', NormalizedStatus::Customs, [3, 4, 5, 0, 1]],
-            ['dhl', 'JD014600003654321', NormalizedStatus::InTransit, [6, 7, 8]],
-            ['aramex', '4587123698', NormalizedStatus::InWarehouse, [9, 10]],
-            ['ups', '1Z999AA10123456784', NormalizedStatus::InTransit, [17, 18]],
-            ['fedex', '794658987654', NormalizedStatus::Delivered, [15, 16]],
+        $numbers = [
+            'fedex' => ['794658123456', '794658987654'],
+            'dhl' => ['JD014600003654321'],
+            'aramex' => ['4587123698'],
+            'ups' => ['1Z999AA10123456784'],
         ];
 
-        foreach ($groups as [$code, $number, $status, $indexes]) {
-            $carrier = $carriers->get($code);
+        $byStatus = collect($orders)
+            ->filter(fn (Order $order): bool => $order->status !== NormalizedStatus::Booked)
+            ->groupBy(fn (Order $order): string => $order->status->value);
 
-            if ($carrier === null) {
-                continue;
-            }
+        $index = 0;
+
+        foreach ($byStatus as $status => $group) {
+            $carrier = $carriers[$index % $carriers->count()];
+            $pool = $numbers[$carrier->code] ?? ['DEMO'.str_pad((string) $index, 8, '0', STR_PAD_LEFT)];
+            $number = $pool[$index % count($pool)].($index > count($pool) ? '-'.$index : '');
 
             $consignment = CarrierConsignment::query()->updateOrCreate(
                 ['carrier_id' => $carrier->id, 'carrier_tracking_number' => $number],
                 [
-                    'internal_status' => $status,
+                    'internal_status' => NormalizedStatus::from($status),
                     'last_raw_status' => $carrier->name.' network scan',
                     'last_location' => 'Dubai',
                     'booked_at' => now()->subDays(8),
@@ -408,11 +422,11 @@ final class DemoDataSeeder extends Seeder
                 ],
             );
 
-            foreach ($indexes as $index) {
-                if (isset($orders[$index])) {
-                    $orders[$index]->forceFill(['carrier_consignment_id' => $consignment->id])->save();
-                }
+            foreach ($group as $order) {
+                $order->forceFill(['carrier_consignment_id' => $consignment->id])->save();
             }
+
+            $index++;
         }
     }
 
