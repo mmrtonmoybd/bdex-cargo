@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Http\Middleware\SetApplicationLocale;
+use App\Support\Localization;
 use App\Support\SiteSettings;
+use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -47,6 +50,14 @@ class PortalPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Portal/Resources'), for: 'App\Filament\Portal\Resources')
             ->discoverPages(in: app_path('Filament/Portal/Pages'), for: 'App\Filament\Portal\Pages')
             ->discoverWidgets(in: app_path('Filament/Portal/Widgets'), for: 'App\Filament\Portal\Widgets')
+            ->userMenuItems([
+                // One click to read the whole panel in the other language; the choice
+                // is remembered for the session.
+                Action::make('switchLanguage')
+                    ->label(fn (): string => (string) __('panel.language.switch'))
+                    ->icon(Heroicon::Language)
+                    ->url(fn (): string => request()->fullUrlWithQuery(['lang' => Localization::other()])),
+            ])
             ->navigationGroups([
                 NavigationGroup::make()->label('My shipping')->icon(Heroicon::OutlinedTruck),
                 NavigationGroup::make()->label('Selling')->icon(Heroicon::OutlinedBuildingStorefront),
@@ -55,6 +66,9 @@ class PortalPanelProvider extends PanelProvider
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
+                // The panel has its own middleware stack, so the language has to be
+                // resolved here as well as in the web group.
+                SetApplicationLocale::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 PreventRequestForgery::class,

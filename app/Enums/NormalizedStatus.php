@@ -28,16 +28,7 @@ enum NormalizedStatus: string implements HasColor, HasLabel
 
     public function getLabel(): string
     {
-        return match ($this) {
-            self::Booked => 'Booked',
-            self::PickedUp => 'Picked up',
-            self::InWarehouse => 'In warehouse',
-            self::InTransit => 'In transit',
-            self::Customs => 'Customs',
-            self::OutForDelivery => 'Out for delivery',
-            self::Delivered => 'Delivered',
-            self::Exception => 'Exception',
-        };
+        return (string) __('panel.status.'.$this->value);
     }
 
     public function getColor(): string

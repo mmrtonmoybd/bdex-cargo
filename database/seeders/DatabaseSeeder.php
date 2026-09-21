@@ -16,6 +16,7 @@ final class DatabaseSeeder extends Seeder
             PaymentConfigSeeder::class,
             SiteSettingSeeder::class,
             ContentBlockSeeder::class,
+            BengaliContentSeeder::class,
             ServiceAreaSeeder::class,
             PricingSeeder::class,
             CarrierSeeder::class,

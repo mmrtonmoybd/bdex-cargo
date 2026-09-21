@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Dashboard;
+use App\Http\Middleware\SetApplicationLocale;
+use App\Support\Localization;
 use App\Support\SiteSettings;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -47,6 +50,14 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             // Listed on the Dashboard page itself, in a deliberate order.
             ->widgets([])
+            ->userMenuItems([
+                // One click to read the whole panel in the other language; the choice
+                // is remembered for the session.
+                Action::make('switchLanguage')
+                    ->label(fn (): string => (string) __('panel.language.switch'))
+                    ->icon(Heroicon::Language)
+                    ->url(fn (): string => request()->fullUrlWithQuery(['lang' => Localization::other()])),
+            ])
             ->navigationGroups([
                 NavigationGroup::make()->label('Operations')->icon(Heroicon::OutlinedTruck),
                 // Carriers sit in their own group so the whole area disappears for a
@@ -68,6 +79,9 @@ class AdminPanelProvider extends PanelProvider
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
+                // The panel has its own middleware stack, so the language has to be
+                // resolved here as well as in the web group.
+                SetApplicationLocale::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 PreventRequestForgery::class,

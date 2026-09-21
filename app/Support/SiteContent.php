@@ -46,9 +46,22 @@ final class SiteContent
         return collect($rows)->map(fn (array $attributes): ContentBlock => (new ContentBlock)->forceFill($attributes));
     }
 
+    /**
+     * A section in the current language, falling back to English.
+     *
+     * A half-translated site should show the untranslated half rather than a
+     * blank space — a missing Bengali row must never empty a section that has
+     * perfectly good English in it.
+     */
     public function section(string $key): ?ContentBlock
     {
-        return $this->all()->get($key);
+        $block = $this->all()->get($key);
+
+        if ($block !== null) {
+            return $block;
+        }
+
+        return app()->getLocale() === 'en' ? null : $this->all('en')->get($key);
     }
 
     public function title(string $key, string $default = ''): string
