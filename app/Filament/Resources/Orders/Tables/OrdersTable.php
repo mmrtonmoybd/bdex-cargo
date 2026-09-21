@@ -9,6 +9,9 @@ use App\Enums\PaymentStatus;
 use App\Enums\StatusSource;
 use App\Models\CarrierConsignment;
 use App\Models\Order;
+use App\Services\Documents\CustomsDeclarationGenerator;
+use App\Services\Documents\InvoiceGenerator;
+use App\Services\Documents\LabelGenerator;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -119,6 +122,33 @@ class OrdersTable
 
                         Notification::make()->title('Status recorded')->success()->send();
                     }),
+                Action::make('paperwork')
+                    ->label('Paperwork')
+                    ->icon('heroicon-o-document-text')
+                    ->schema([
+                        Select::make('document')
+                            ->label('Generate')
+                            ->options([
+                                'invoice' => 'Invoice',
+                                'label' => 'Shipping labels (one per box)',
+                                'customs' => 'Customs declaration',
+                            ])
+                            ->default('invoice')
+                            ->required(),
+                    ])
+                    ->action(function (Order $record, array $data): void {
+                        $path = match ($data['document']) {
+                            'label' => app(LabelGenerator::class)->forOrder($record),
+                            'customs' => app(CustomsDeclarationGenerator::class)->generate($record),
+                            default => app(InvoiceGenerator::class)->generate($record)->pdf_path,
+                        };
+
+                        Notification::make()
+                            ->title('Document generated')
+                            ->body('Saved against the shipment — open it from the Documents tab.')
+                            ->success()
+                            ->send();
+                    }),
                 EditAction::make(),
             ])
             ->toolbarActions([
@@ -150,6 +180,36 @@ class OrdersTable
 
                             Notification::make()
                                 ->title($records->count().' order(s) consolidated')
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
+
+                    BulkAction::make('printLabels')
+                        ->label('Print labels')
+                        ->icon('heroicon-o-printer')
+                        ->modalDescription('Produces one PDF containing every box label for the selected shipments — fifty labels in one or two clicks rather than fifty.')
+                        ->action(function (Collection $records): void {
+                            app(LabelGenerator::class)->forOrders($records);
+
+                            Notification::make()
+                                ->title('Labels ready')
+                                ->body($records->count().' shipment(s) — open the batch from any of their Documents tabs.')
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
+
+                    BulkAction::make('generateInvoices')
+                        ->label('Generate invoices')
+                        ->icon('heroicon-o-document-currency-dollar')
+                        ->action(function (Collection $records): void {
+                            $generator = app(InvoiceGenerator::class);
+
+                            $records->each(fn (Order $order) => $generator->generate($order));
+
+                            Notification::make()
+                                ->title($records->count().' invoice(s) issued')
                                 ->success()
                                 ->send();
                         })

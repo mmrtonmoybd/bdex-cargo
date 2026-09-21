@@ -41,6 +41,51 @@ it('opens an editor for every seeded section', function (): void {
     }
 });
 
+/**
+ * An editor that opens but shows none of the section's content is worse than no
+ * editor at all — it reads as "there is nothing here" when there is. This walks
+ * every seeded list and proves its rows actually reach the rendered form.
+ */
+it('shows every stored list in its editor', function (): void {
+    $lists = [
+        'hero' => ['chips', 'slideLabels'],
+        'about' => ['assurances'],
+        'solutions' => ['cards'],
+        'services' => ['benefits'],
+        'booking' => ['perks'],
+        'journey' => ['steps'],
+        'dropoff' => ['rules', 'labelFields'],
+        'terms' => ['items'],
+        'faq' => ['items'],
+        'why' => ['items'],
+        'testimonials' => ['quotes'],
+        'nav' => ['links'],
+        'marquee' => ['items'],
+        'stats' => ['cells'],
+        'footer' => ['columns', 'badges'],
+    ];
+
+    foreach ($lists as $section => $keys) {
+        $block = ContentBlock::query()->where('section_key', $section)->sole();
+        $html = livewire(EditContentBlock::class, ['record' => $block->getRouteKey()])->html();
+
+        foreach ($keys as $key) {
+            $rows = $block->data[$key] ?? [];
+
+            expect($rows)->not->toBeEmpty("{$section}.{$key} was not seeded");
+
+            $first = $rows[0];
+            $needle = trim(strip_tags(is_array($first) ? (string) collect($first)->flatten()->first() : (string) $first));
+
+            // Livewire embeds its state as JSON, so a value may appear escaped.
+            $escaped = trim((string) json_encode($needle), '"');
+
+            expect(str_contains($html, e($needle)) || str_contains($html, $escaped))
+                ->toBeTrue("{$section}.{$key} is stored but does not render in its editor");
+        }
+    }
+});
+
 it('edits a customer quote and shows it on the page', function (): void {
     $block = ContentBlock::query()->where('section_key', 'testimonials')->sole();
 
