@@ -21,7 +21,7 @@ use Spatie\Permission\Traits\HasRoles;
  * from Filament Shield's own UI, so the client can invent a role the code has
  * never heard of and have it work.
  */
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'email_verified_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser
 {
