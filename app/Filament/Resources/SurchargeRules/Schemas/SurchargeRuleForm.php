@@ -80,8 +80,8 @@ class SurchargeRuleForm
                                 ->required()
                                 ->numeric()
                                 ->minValue(0)
-                                ->prefix(fn (Get $get): ?string => CalculationType::tryFrom((string) $get('calculation_type')) === CalculationType::Percentage ? null : '$')
-                                ->suffix(fn (Get $get): ?string => match (CalculationType::tryFrom((string) $get('calculation_type'))) {
+                                ->prefix(fn (Get $get): ?string => self::calculation($get('calculation_type')) === CalculationType::Percentage ? null : '$')
+                                ->suffix(fn (Get $get): ?string => match (self::calculation($get('calculation_type'))) {
                                     CalculationType::Percentage => '%',
                                     CalculationType::PerKg => 'per kg',
                                     CalculationType::PerItem => 'per item',
@@ -114,8 +114,8 @@ class SurchargeRuleForm
                             TextInput::make('condition_value')
                                 ->label('Value')
                                 ->numeric()
-                                ->required(fn (Get $get): bool => ConditionOperator::tryFrom((string) $get('condition_operator'))?->requiresValue() ?? false)
-                                ->visible(fn (Get $get): bool => ConditionOperator::tryFrom((string) $get('condition_operator'))?->requiresValue() ?? false),
+                                ->required(fn (Get $get): bool => self::operator($get('condition_operator'))?->requiresValue() ?? false)
+                                ->visible(fn (Get $get): bool => self::operator($get('condition_operator'))?->requiresValue() ?? false),
                         ]),
                     ]),
 
@@ -135,13 +135,34 @@ class SurchargeRuleForm
     }
 
     /**
+     * Form state arrives as an enum on edit and a raw string on create.
+     *
+     * Casting it to string works for one and fatals for the other, so every read
+     * of an enum-backed field goes through these three helpers instead.
+     */
+    private static function calculation(mixed $state): ?CalculationType
+    {
+        return $state instanceof CalculationType ? $state : CalculationType::tryFrom((string) $state);
+    }
+
+    private static function operator(mixed $state): ?ConditionOperator
+    {
+        return $state instanceof ConditionOperator ? $state : ConditionOperator::tryFrom((string) $state);
+    }
+
+    private static function conditionField(mixed $state): ?ConditionField
+    {
+        return $state instanceof ConditionField ? $state : ConditionField::tryFrom((string) $state);
+    }
+
+    /**
      * A boolean fact only supports "is true"; a numeric one supports comparisons.
      *
      * @return array<string, string>
      */
     private static function operatorsFor(mixed $field): array
     {
-        $field = ConditionField::tryFrom((string) $field);
+        $field = self::conditionField($field);
 
         $operators = $field?->isBoolean() === true
             ? [ConditionOperator::IsTrue]

@@ -27,7 +27,7 @@ final class AwaitingConsolidationTable extends TableWidget
 
     public static function canView(): bool
     {
-        return auth()->user()?->can('ViewAnyOrder') ?? false;
+        return auth()->user()?->can('ViewAny:Order') ?? false;
     }
 
     public function table(Table $table): Table

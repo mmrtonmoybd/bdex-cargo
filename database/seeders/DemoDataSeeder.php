@@ -22,6 +22,8 @@ use App\Models\Seller;
 use App\Models\SellerListing;
 use App\Models\SellerReview;
 use App\Models\ShippingRoute;
+use App\Models\SurchargeRule;
+use App\Models\TvSizeBand;
 use App\Services\Pricing\PricingEngine;
 use App\Services\Pricing\QuoteItem;
 use Illuminate\Database\Seeder;
@@ -47,12 +49,59 @@ final class DemoDataSeeder extends Seeder
         $bdToAu = ShippingRoute::query()->where('code', 'BD_TO_AU')->firstOrFail();
 
         $this->fxRate();
+        $this->completeFlaggedPricing();
         $customers = $this->customers();
         $sellers = $this->sellers($customers, $auToBd);
         $orders = $this->orders($auToBd, $bdToAu, $customers, $sellers);
         $this->consolidate($orders);
         $this->invoices($orders);
         $this->enquiries($auToBd, $bdToAu);
+    }
+
+    /**
+     * Fills the figures the published rate card never stated, so a demo system
+     * quotes every size and every category without a warning banner.
+     *
+     * These are DEMO numbers, invented to make the system exercisable — they are
+     * not published BD-EX rates. PricingSeeder deliberately leaves them blank and
+     * flagged; this seeder is the one allowed to make them up, and clearing the
+     * placeholder flag here is what silences the dashboard warning. Before going
+     * live, confirm each of them with operations and re-enter the real figure.
+     */
+    private function completeFlaggedPricing(): void
+    {
+        // Volume fee scaled down from the published 55-inch figure ($145), local
+        // delivery matched to the smaller-parcel band.
+        $bands = [
+            '28-32"' => ['volume' => 70, 'delivery' => 1500],
+            '33-37"' => ['volume' => 85, 'delivery' => 1500],
+            '38-42"' => ['volume' => 100, 'delivery' => 1500],
+            '43-47"' => ['volume' => 115, 'delivery' => 1500],
+            '48-52"' => ['volume' => 130, 'delivery' => 2000],
+        ];
+
+        foreach ($bands as $label => $figures) {
+            TvSizeBand::query()
+                ->where('size_label', $label)
+                ->update([
+                    'volume_fee_aud' => $figures['volume'],
+                    'local_delivery_bdt' => $figures['delivery'],
+                    'is_active' => true,
+                ]);
+        }
+
+        // The rate card prints "$15 & $20 extra for each item over $100" without
+        // saying which applies when. The demo settles on the lower figure.
+        SurchargeRule::query()
+            ->where('code', 'au_bd_electrical_high_value')
+            ->update([
+                'amount' => 15,
+                'is_placeholder_amount' => false,
+            ]);
+
+        SurchargeRule::query()
+            ->where('code', 'bd_au_non_garment_handling')
+            ->update(['is_placeholder_amount' => false]);
     }
 
     private function fxRate(): void

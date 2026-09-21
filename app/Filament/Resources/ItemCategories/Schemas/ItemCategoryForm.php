@@ -16,6 +16,15 @@ use Filament\Schemas\Schema;
 
 class ItemCategoryForm
 {
+    /**
+     * Form state is an enum on edit and a raw string on create; reading it as a
+     * string fatals on the former.
+     */
+    private static function model(mixed $state): ?PricingModel
+    {
+        return $state instanceof PricingModel ? $state : PricingModel::tryFrom((string) $state);
+    }
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -49,7 +58,7 @@ class ItemCategoryForm
                             ->required()
                             ->live()
                             ->default(PricingModel::PerKgByZone)
-                            ->helperText(fn (Get $get): string => match (PricingModel::tryFrom((string) $get('pricing_model'))) {
+                            ->helperText(fn (Get $get): string => match (self::model($get('pricing_model'))) {
                                 PricingModel::PerKgByZone => 'Rate comes from the Zone rates tab — one rate per zone.',
                                 PricingModel::PerKgFlat => 'One rate per kg, the same in every zone. Enter it below.',
                                 PricingModel::FlatFee => 'One amount for the whole line, whatever it weighs.',
@@ -60,14 +69,14 @@ class ItemCategoryForm
 
                         Grid::make(2)->schema([
                             TextInput::make('flat_fee_amount')
-                                ->label(fn (Get $get): string => PricingModel::tryFrom((string) $get('pricing_model')) === PricingModel::PerKgFlat
+                                ->label(fn (Get $get): string => self::model($get('pricing_model')) === PricingModel::PerKgFlat
                                     ? 'Rate per kg'
                                     : 'Amount')
                                 ->numeric()
                                 ->prefix('$')
                                 ->minValue(0)
-                                ->required(fn (Get $get): bool => PricingModel::tryFrom((string) $get('pricing_model'))?->usesFlatFeeAmount() ?? false)
-                                ->visible(fn (Get $get): bool => PricingModel::tryFrom((string) $get('pricing_model'))?->usesFlatFeeAmount() ?? false),
+                                ->required(fn (Get $get): bool => self::model($get('pricing_model'))?->usesFlatFeeAmount() ?? false)
+                                ->visible(fn (Get $get): bool => self::model($get('pricing_model'))?->usesFlatFeeAmount() ?? false),
 
                             TextInput::make('max_weight_kg')
                                 ->label('Covered up to (kg)')

@@ -30,7 +30,7 @@ function staffWith(string ...$permissions): User
 it('renders the dashboard', function (): void {
     Order::factory()->count(3)->create();
 
-    $this->actingAs(staffWith('View:Dashboard', 'ViewAnyOrder'));
+    $this->actingAs(staffWith('View:Dashboard', 'ViewAny:Order'));
 
     livewire(Dashboard::class)->assertSuccessful();
 });
