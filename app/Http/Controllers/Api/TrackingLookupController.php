@@ -6,62 +6,79 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\BookingEnquiry;
+use App\Services\Tracking\CustomerFacingOrder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
 
 /**
  * Public tracking lookup.
  *
- * Today this answers for booking references; once orders exist it answers for
- * their BD-EX tracking numbers too. What it will never do is name a carrier or
- * echo a carrier's own tracking number — customers see BD-EX milestones only.
+ * Reads through {@see CustomerFacingOrder} and nothing else, so it is
+ * structurally incapable of naming a carrier or echoing a carrier's tracking
+ * number. A booking reference is also accepted, for the window between someone
+ * booking and their order being raised.
  */
 final class TrackingLookupController extends Controller
 {
-    /** The milestone vocabulary the public site shows, in order. */
-    private const STEPS = [
-        'new' => ['Booking received', 'Awaiting pickup confirmation'],
-        'confirmed' => ['Pickup confirmed', 'Driver assigned'],
-        'collected' => ['Picked up', 'With our team'],
-        'in_warehouse' => ['In warehouse', 'Weighed and consolidated'],
-        'in_transit' => ['In transit', 'On the aircraft'],
-        'delivered' => ['Delivered', 'Proof of delivery recorded'],
-    ];
+    public function __construct(private readonly CustomerFacingOrder $orders) {}
 
     public function __invoke(string $reference): JsonResponse
     {
-        $enquiry = BookingEnquiry::query()
-            ->where('reference', strtoupper(trim($reference)))
-            ->first();
+        $reference = strtoupper(trim($reference));
 
-        if ($enquiry === null) {
+        $order = $this->orders->find($reference);
+
+        if ($order !== null) {
+            $payload = $this->orders->payload($order);
+
             return response()->json([
-                'found' => false,
-                'message' => 'No parcel found for that number. Check the reference on your booking confirmation.',
-            ], 404);
+                'found' => true,
+                'reference' => $payload['tracking_number'],
+                'status_label' => strtoupper($payload['status_label']),
+                'current_step' => $payload['current_step'],
+                'steps' => $this->steps($payload['timeline']),
+                'estimated_delivery_text' => $payload['estimated_delivery_text'],
+                'proof_of_delivery_url' => $payload['proof_of_delivery_url'],
+            ]);
         }
 
-        $keys = array_keys(self::STEPS);
-        $current = array_search($enquiry->status, $keys, true);
-        $current = $current === false ? 0 : $current;
+        $enquiry = BookingEnquiry::query()->where('reference', $reference)->first();
 
-        $steps = [];
-
-        foreach (self::STEPS as $index => [$label, $detail]) {
-            $position = array_search($index, $keys, true);
-            $steps[] = [
-                $label,
-                $position <= $current
-                    ? strtoupper($enquiry->updated_at->format('D j M · H:i'))
-                    : strtoupper($detail),
-            ];
+        if ($enquiry !== null) {
+            return response()->json([
+                'found' => true,
+                'reference' => $enquiry->reference,
+                'status_label' => 'BOOKING RECEIVED',
+                'current_step' => 0,
+                'steps' => [
+                    ['Booking received', strtoupper($enquiry->created_at->format('D j M · H:i'))],
+                    ['Pickup being arranged', 'OUR TEAM WILL CALL WITHIN 24 HOURS'],
+                ],
+            ]);
         }
 
         return response()->json([
-            'found' => true,
-            'reference' => $enquiry->reference,
-            'status_label' => strtoupper(str_replace('_', ' ', $enquiry->status)),
-            'current_step' => $current,
-            'steps' => $steps,
-        ]);
+            'found' => false,
+            'message' => 'No parcel found for that number. Check the reference on your booking confirmation.',
+        ], 404);
+    }
+
+    /**
+     * The design's two-column timeline: what happened, and when.
+     *
+     * @param  array<int, array<string, mixed>>  $timeline
+     * @return array<int, array<int, string>>
+     */
+    private function steps(array $timeline): array
+    {
+        return array_map(static function (array $step): array {
+            $when = $step['occurred_at'] === null
+                ? strtoupper((string) $step['detail'])
+                : strtoupper(Carbon::parse($step['occurred_at'])->format('D j M · H:i'));
+
+            $where = $step['location'] === null ? '' : ' · '.strtoupper((string) $step['location']);
+
+            return [(string) $step['label'], $when.$where];
+        }, $timeline);
     }
 }

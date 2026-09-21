@@ -81,6 +81,35 @@ final class DynamicConfig
         self::forget($key);
     }
 
+    /**
+     * Declares a credential slot without setting a value.
+     *
+     * Lets a seeder publish the fields a provider needs — so they appear on the
+     * Configuration page ready to fill — without ever shipping a secret in code.
+     * An existing value is left untouched.
+     */
+    public static function defineSecret(
+        string $key,
+        string $group,
+        string $label,
+        ?string $description = null,
+        int $sortOrder = 0,
+    ): void {
+        $entry = ConfigEntry::query()->firstOrNew(['key' => $key]);
+
+        $entry->fill([
+            'is_secret' => true,
+            'group' => $group,
+            'label' => $label,
+            'description' => $description,
+            'sort_order' => $sortOrder,
+        ]);
+
+        $entry->save();
+
+        self::forget($key);
+    }
+
     public static function forget(string $key): void
     {
         Cache::forget(self::cacheKey($key));

@@ -27,7 +27,7 @@ return [
             'pages' => true,
             'widgets' => true,
             'resources' => true,
-            'custom_permissions' => false,
+            'custom_permissions' => true,
         ],
     ],
 
@@ -252,7 +252,18 @@ return [
     |
     */
 
-    'custom_permissions' => [],
+    'custom_permissions' => [
+        /*
+         * The one permission this system needs that is not a resource action.
+         *
+         * BD-EX ships with real carriers but presents itself as the carrier.
+         * Seeing which carrier actually carried a shipment — and its tracking
+         * number — is therefore a privilege, not a given. Registering it here
+         * rather than as a hardcoded Gate means it appears in the same role editor
+         * as everything else, so the client can grant or revoke it themselves.
+         */
+        'view_carrier_details',
+    ],
 
     /*
     |--------------------------------------------------------------------------

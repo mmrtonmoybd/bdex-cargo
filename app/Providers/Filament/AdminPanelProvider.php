@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Dashboard;
 use App\Support\SiteSettings;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
@@ -11,12 +12,10 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
-use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -46,10 +45,13 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
-            ->widgets([
-                AccountWidget::class,
-            ])
+            // Listed on the Dashboard page itself, in a deliberate order.
+            ->widgets([])
             ->navigationGroups([
+                NavigationGroup::make()->label('Operations')->icon(Heroicon::OutlinedTruck),
+                // Carriers sit in their own group so the whole area disappears for a
+                // role without ViewCarrierDetails, rather than showing empty pages.
+                NavigationGroup::make()->label('Carriers')->icon(Heroicon::OutlinedPaperAirplane),
                 NavigationGroup::make()->label('Pricing')->icon(Heroicon::OutlinedBanknotes),
                 NavigationGroup::make()->label('Content')->icon(Heroicon::OutlinedNewspaper),
                 NavigationGroup::make()->label('System')->icon(Heroicon::OutlinedCog6Tooth),
